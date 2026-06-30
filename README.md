@@ -30,9 +30,7 @@ The downloaded collection contains eight physical lithium-ion cells distributed 
 | NMC | `NMC_CELL_1`, `NMC_CELL_2` | 2 |
 | **Total** | — | **8** |
 
-
 Additional reference files include:
-
 - chemistry-specific open-circuit-voltage measurements;
 - ambient-temperature measurements;
 - experimental comments;
@@ -55,7 +53,6 @@ Let $N_c$ denote the number of registered experimental segments for physical cel
 | **Total** | — | **4,942** |
 
 The total number of experimental segments is
-
 ```math
 \begin{aligned}
 N_{\mathrm{segments}}
@@ -65,9 +62,7 @@ N_{\mathrm{segments}}
 4{,}942.
 \end{aligned}
 ```
-
 The chemistry-level segment totals are
-
 ```math
 N_{\mathrm{LFP}}
 =
@@ -75,7 +70,6 @@ N_{\mathrm{LFP}}
 =
 1{,}332,
 ```
-
 ```math
 N_{\mathrm{NCA}}
 =
@@ -83,9 +77,7 @@ N_{\mathrm{NCA}}
 =
 2{,}380,
 ```
-
 and
-
 ```math
 N_{\mathrm{NMC}}
 =
@@ -93,9 +85,7 @@ N_{\mathrm{NMC}}
 =
 1{,}230.
 ```
-
 Therefore,
-
 ```math
 \begin{aligned}
 N_{\mathrm{segments}}
@@ -115,24 +105,17 @@ N_{\mathrm{NMC}} \\
 4{,}942.
 \end{aligned}
 ```
-
 The NCA chemistry contributes the largest number of segments because it contains four physical cells, whereas the LFP and NMC groups each contain two cells. 
 
 <img width="1869" height="1404" alt="image" src="https://github.com/user-attachments/assets/83d55d6c-1131-4e4e-9772-79c6974de653" />
 
-
-
-## Observed Voltage, Current, in Downloaded Data 
+### Segment-level current-span versus voltage-span diversity for LFP, NCA, and NMC cells. 
 
 <img width="1876" height="724" alt="image" src="https://github.com/user-attachments/assets/16be399c-64d6-47e9-a679-4a83c37217a6" />
-
-
-## Segment-level current-span versus voltage-span diversity for LFP, NCA, and NMC cells. 
 
 ![Current-span versus voltage-span diversity](figures/step1_current_span_vs_voltage_span.png)
 
 Each point represents one experimental segment. The horizontal axis shows the current span,
-
 \[
 \Delta I_s = I_{\max,s}-I_{\min,s},
 \]
