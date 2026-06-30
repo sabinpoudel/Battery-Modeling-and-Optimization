@@ -9,11 +9,12 @@ The datasets used in this study were downloaded from the **FairData repository**
 Grateful acknowledgement is given to the **New Energy Research Center, Turku University of Applied Sciences, Turku, Finland**, for conducting the battery degradation experiments, collecting the voltage, current, temperature, and operating-profile measurements, and making the raw and processed datasets publicly available through FairData. 
 
 
+
 ## 4. Dataset Composition
 
-The downloaded datasets contains eight physical lithium-ion cells distributed across three battery chemistries:
+The downloaded collection contains eight physical lithium-ion cells distributed across three battery chemistries:
 
-\[
+$$
 \mathcal{C}
 =
 \left\{
@@ -21,7 +22,7 @@ The downloaded datasets contains eight physical lithium-ion cells distributed ac
 \mathrm{NCA},
 \mathrm{NMC}
 \right\}.
-\]
+$$
 
 | Chemistry | Physical cells | Number of cells |
 |:---:|:---|---:|
@@ -30,9 +31,9 @@ The downloaded datasets contains eight physical lithium-ion cells distributed ac
 | NMC | `NMC_CELL_1`, `NMC_CELL_2` | 2 |
 | **Total** | — | **8** |
 
-The total number of physical cells is therefore
+The total number of physical cells is
 
-\[
+$$
 N_{\mathrm{cells}}
 =
 2_{\mathrm{LFP}}
@@ -42,7 +43,7 @@ N_{\mathrm{cells}}
 2_{\mathrm{NMC}}
 =
 8.
-\]
+$$
 
 Additional reference files include:
 
@@ -53,7 +54,7 @@ Additional reference files include:
 
 Each physical-cell file contains multiple experimental segments. One segment represents either a complete test trajectory or one stage of an experimental cycle.
 
-Let \(N_{c}\) denote the number of registered segments for physical cell \(c\). The segment counts are summarized below.
+Let $N_c$ denote the number of registered experimental segments for physical cell $c$. The segment counts are summarized below.
 
 | Physical cell | Chemistry | Segment count |
 |:---|:---:|---:|
@@ -69,75 +70,64 @@ Let \(N_{c}\) denote the number of registered segments for physical cell \(c\). 
 
 The total number of experimental segments is
 
-\[
+$$
 \begin{aligned}
 N_{\mathrm{segments}}
 &=
-660
-+
-672
-+
-602
-+
-505
-+
-576
-+
-697
-+
-617
-+
-613 \\
+660+672+602+505+576+697+617+613 \\
 &=
 4{,}942.
 \end{aligned}
-\]
+$$
 
-Total chemistry-level segment are
+The chemistry-level segment totals are
 
-\[
+$$
 N_{\mathrm{LFP}}
 =
 660+672
 =
 1{,}332,
-\]
+$$
 
-\[
+$$
 N_{\mathrm{NCA}}
 =
 602+505+576+697
 =
 2{,}380,
-\]
+$$
 
 and
 
-\[
+$$
 N_{\mathrm{NMC}}
 =
 617+613
 =
 1{,}230.
-\]
+$$
 
-Hence,
+Therefore,
 
-\[
+$$
+\begin{aligned}
 N_{\mathrm{segments}}
-=
+&=
 N_{\mathrm{LFP}}
 +
 N_{\mathrm{NCA}}
 +
-N_{\mathrm{NMC}}
-=
+N_{\mathrm{NMC}} \\
+&=
 1{,}332
 +
 2{,}380
 +
-1{,}230
-=
+1{,}230 \\
+&=
 4{,}942.
-\]
-The NCA chemistry contributes the largest number of segments. It contains four physical cells, whereas the LFP and NMC groups each contain two cells.
+\end{aligned}
+$$
+
+The NCA chemistry contributes the largest number of segments, it contains four physical cells, whereas the LFP and NMC groups each contain two cells. 
