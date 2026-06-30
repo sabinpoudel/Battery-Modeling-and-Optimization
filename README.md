@@ -9,12 +9,11 @@ The datasets used in this study were downloaded from the **FairData repository**
 Grateful acknowledgement is given to the **New Energy Research Center, Turku University of Applied Sciences, Turku, Finland**, for conducting the battery degradation experiments, collecting the voltage, current, temperature, and operating-profile measurements, and making the raw and processed datasets publicly available through FairData. 
 
 
+## 1. Dataset Composition
 
-## 4. Dataset Composition
+The downloaded collection contains eight physical lithium-ion cells distributed across three battery chemistries.
 
-The downloaded collection contains eight physical lithium-ion cells distributed across three battery chemistries:
-
-$$
+```math
 \mathcal{C}
 =
 \left\{
@@ -22,7 +21,7 @@ $$
 \mathrm{NCA},
 \mathrm{NMC}
 \right\}.
-$$
+```
 
 | Chemistry | Physical cells | Number of cells |
 |:---:|:---|---:|
@@ -33,7 +32,7 @@ $$
 
 The total number of physical cells is
 
-$$
+```math
 N_{\mathrm{cells}}
 =
 2_{\mathrm{LFP}}
@@ -43,7 +42,7 @@ N_{\mathrm{cells}}
 2_{\mathrm{NMC}}
 =
 8.
-$$
+```
 
 Additional reference files include:
 
@@ -70,7 +69,7 @@ Let $N_c$ denote the number of registered experimental segments for physical cel
 
 The total number of experimental segments is
 
-$$
+```math
 \begin{aligned}
 N_{\mathrm{segments}}
 &=
@@ -78,39 +77,39 @@ N_{\mathrm{segments}}
 &=
 4{,}942.
 \end{aligned}
-$$
+```
 
 The chemistry-level segment totals are
 
-$$
+```math
 N_{\mathrm{LFP}}
 =
 660+672
 =
 1{,}332,
-$$
+```
 
-$$
+```math
 N_{\mathrm{NCA}}
 =
 602+505+576+697
 =
 2{,}380,
-$$
+```
 
 and
 
-$$
+```math
 N_{\mathrm{NMC}}
 =
 617+613
 =
 1{,}230.
-$$
+```
 
 Therefore,
 
-$$
+```math
 \begin{aligned}
 N_{\mathrm{segments}}
 &=
@@ -128,6 +127,6 @@ N_{\mathrm{NMC}} \\
 &=
 4{,}942.
 \end{aligned}
-$$
+```
 
-The NCA chemistry contributes the largest number of segments, it contains four physical cells, whereas the LFP and NMC groups each contain two cells. 
+The NCA chemistry contributes the largest number of segments because it contains four physical cells, whereas the LFP and NMC groups each contain two cells. 
