@@ -370,4 +370,140 @@ $` p_{c,r} = \frac{N_{c,r}^{\mathrm{transition}}} {\sum_{q}N_{c,q}^{\mathrm{tran
 where $`p_{c,r}`$ is the transition fraction assigned to partition $`r`$ for cell $`c`$.
 
 
- 
+
+## LPV Model-Readiness by Physical Cell and Chemistry
+
+<img width="1934" height="1351" alt="image" src="https://github.com/user-attachments/assets/b5c6bbee-e1cd-46e6-83ed-c572cca8c490" />
+
+This figure reports the fraction of saved rows that satisfy three progressively different model-readiness conditions:
+
+- **Scheduling variables complete:** all required scheduling variables—SOC, transformed current, temperature, and SOH—are available.
+- **LPV identification valid:** the row contains complete scheduling information and satisfies the conditions required for LPV parameter identification.
+- **Strict voltage evaluation valid:** the row also satisfies the additional requirements imposed for strict terminal-voltage evaluation.
+
+#### Physical-Cell-Level Results
+The upper panel shows that complete scheduling-variable coverage varies between approximately **27% and 38%** across the eight cells.
+- `NCA_CELL_4` has the highest readiness, at approximately **37–38%**.
+- `LFP_CELL_1` and `LFP_CELL_2` provide approximately **35–37%** valid coverage.
+- `NCA_CELL_2` provides approximately **32%**.
+- `NCA_CELL_1`, `NCA_CELL_3`, and `NMC_CELL_2` provide approximately **28–29%**.
+- `NMC_CELL_1` has the lowest coverage, at approximately **27%**.
+
+The blue and orange bars are nearly identical for every cell. This indicates that almost every row with complete scheduling variables also satisfies the LPV-identification mask. Consequently, the principal limitation is the availability of complete SOC, temperature, current, and SOH information rather than an additional identification-stage exclusion.
+
+#### Chemistry-Level Results
+
+The lower panel aggregates the same quantities by chemistry:
+
+- **LFP:** approximately **36%** model-ready rows;
+- **NCA:** approximately **32%**;
+- **NMC:** approximately **28%**.
+
+LFP therefore provides the largest relative proportion of usable LPV-identification rows, while NMC provides the smallest. These percentages describe relative coverage.
+
+#### Strict Voltage-Evaluation Coverage
+
+The green bars are almost zero for all cells and chemistries. Only a very small fraction appears for `NCA_CELL_1`. This result indicates that the strict voltage-evaluation mask is substantially more restrictive than the LPV-identification mask. Possible limiting requirements include:
+
+- valid next-step voltage targets;
+- valid consecutive dynamic transitions;
+- complete split-safe state information;
+- acceptable timing intervals;
+- exclusion of segment boundaries;
+- absence of review or leakage flags;
+- availability of all required evaluation variables.
+
+The figure shows that approximately one-third of the saved observations are suitable for LPV identification. The similarity between scheduling completeness and LPV validity confirms that missing or unavailable scheduling-state information is the dominant restriction. However, the almost absent strict voltage-evaluation subset is a critical diagnostic result.
+
+
+
+## Ambient-Temperature Alignment Quality
+
+<img width="1934" height="1433" alt="image" src="https://github.com/user-attachments/assets/b6d9c355-2a79-44be-b961-cab48415ed76" />
+
+This figure evaluates the causal alignment of ambient-temperature observations with the battery measurements.
+For battery timestamp $`t_k`$, the backward matching lag is
+
+$`\Delta t_k^{\mathrm{ambient}} = t_k - t_k^{\mathrm{ambient}}`$,
+
+where causal alignment requires
+
+$`\Delta t_k^{\mathrm{ambient}} \geq 0`$.
+
+
+#### Ambient-Alignment Outcomes
+The upper panel reports three row-level fractions:
+
+- **Valid causal match:** an earlier ambient observation was found within the permitted tolerance;
+- **Tolerance exceeded:** no sufficiently recent ambient observation was available;
+- **Future match:** an ambient observation from the future was assigned.
+
+Most cells achieve high valid-match coverage:
+
+- `NCA_CELL_4` reaches approximately **100%** valid alignment;
+- LFP and NMC cells achieve approximately **96%**;
+- `NCA_CELL_1` and `NCA_CELL_3` achieve approximately **90%**;
+- `NCA_CELL_2` has the lowest coverage at approximately **78%**.
+
+The tolerance-exceeded fraction is largest for `NCA_CELL_2`, at approximately **22%**, indicating weaker temporal overlap with the ambient-temperature record.
+No visible future-match fraction occurs for any cell. This confirms that the alignment procedure preserves temporal causality.
+
+### Distribution of Valid Match Lags
+
+The lower panel shows the lag distribution only for successfully matched observations.
+
+Most valid matches occur with lags near **0–1 s**, which is consistent with the approximately one-second sampling rate of the battery and ambient datasets. The dashed line at **2 s** marks the review threshold, while the dotted line at **10 s** marks the maximum matching tolerance. A small number of outlying valid lags are visible:
+- approximately **4 s** for `LFP_CELL_1`;
+- approximately **5 s** for `NCA_CELL_2`;
+- approximately **7 s** for `NMC_CELL_1`.
+These observations exceed the review threshold but remain below the 10-second matching tolerance. They are therefore retained as valid causal matches while remaining identifiable for sensitivity analysis. Rows classified as tolerance-exceeded are not represented in the lower box plots because those plots contain only valid matches.
+
+The figure confirms that ambient-temperature alignment is predominantly successful and strictly causal. Most accepted matches are temporally close to the corresponding battery observations, and no future environmental measurements are introduced.
+
+
+<img width="1901" height="618" alt="image" src="https://github.com/user-attachments/assets/fa833476-8e1f-480e-a8c1-fc00ece2eadc" />
+
+## LPV-Identification Scheduling-Space Density
+
+<img width="1901" height="618" alt="image" src="https://github.com/user-attachments/assets/fa833476-8e1f-480e-a8c1-fc00ece2eadc" />
+
+This figure shows the operating-space coverage of rows accepted for LPV identification for the LFP, NCA, and NMC chemistries. The horizontal axis represents split-safe state of charge, while the vertical axis represents the transformed current scheduling variable:
+
+$`\rho_I=\log\left(1+\frac{|I|}{I_{\mathrm{ref}}}\right)`$.
+
+Therefore, larger vertical-axis values indicate greater current magnitude, regardless of whether the original source current represents charging or discharging. Current direction is retained separately by the scheduling-direction variable.
+
+The color scale represents $`\log(1+n)`$, where $`n`$ is the number of valid LPV rows within a scheduling-space bin:
+
+- black regions contain no or very few observations;
+- dark red regions indicate low density;
+- orange and yellow regions indicate progressively higher density.
+
+####  LFP Scheduling Coverage
+The LFP data form several narrow horizontal bands near transformed-current values of approximately 0, 0.45, 0.77, and 1.20. These bands indicate repeated operation at discrete current levels. A descending family of trajectories appears near high SOC, approximately from SOC 1.0 to slightly above 1.0. This structure reflects the relationship between SOC evolution and current changes during particular charging or discharge protocols. LFP coverage is concentrated along specific operating trajectories rather than uniformly distributed throughout the two-dimensional domain.
+
+#### NCA Scheduling Coverage
+
+NCA provides the broadest and most heterogeneous scheduling-space coverage. Valid observations extend over a wide SOC interval and include numerous current levels.
+The densest region occurs approximately between:
+- SOC 0.4–1.0;
+- transformed current 0.2–0.7.
+Several horizontal bands and curved trajectories are visible, indicating repeated current setpoints together with dynamically changing current profiles. Compared with LFP and NMC, NCA provides the richest excitation diversity for identifying SOC- and current-dependent LPV parameters.
+
+### NMC Scheduling Coverage
+
+NMC exhibits several dominant horizontal bands near transformed-current values of approximately 0, 0.57, 0.93, and 1.40. A pronounced descending trajectory appears near high SOC. However, the intermediate and low-SOC regions contain substantially less coverage than the corresponding NCA panel.### Modeling Implications
+
+The figure demonstrates that the scheduling variables are not sampled uniformly. Identification reliability is expected to be strongest in high-density regions and weaker in black or sparsely populated regions.
+
+This has several consequences:
+
+- parameter estimates should not be interpreted equally across the complete rectangular domain;
+- calibration and test rows outside the training support require explicit extrapolation flags;
+- sparse or regularized LPV basis functions may be preferable to highly flexible unrestricted surfaces;
+- chemistry-specific scheduling domains should be retained;
+- current direction should be considered separately because the plotted current magnitude does not distinguish charging from discharging.
+
+The narrow bands also show that much of the dataset follows predefined experimental current levels. Consequently, apparent coverage over a broad SOC range does not necessarily imply equally broad current excitation at every SOC value.
+
+NCA provides the broadest two-dimensional excitation coverage, while LFP and NMC are more strongly concentrated along discrete current bands and high-SOC trajectories. The figure therefore identifies where LPV parameter estimation is data-supported and where predictions would involve interpolation or extrapolation.
