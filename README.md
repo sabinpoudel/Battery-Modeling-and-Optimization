@@ -234,55 +234,13 @@ The baseline capacities shown here are preprocessing references. Training-only b
 
 ## Reference Discharge-Capacity and Event-Level SOH Evolution
 
-![Reference discharge-capacity and SOH evolution](figures/step6_capacity_and_soh_evolution.png)
-
-This figure shows the evolution of accepted reference-discharge capacity events and the corresponding state of health for all eight physical cells. The horizontal axis represents the segment index at which each capacity event occurs and therefore provides the chronological position of the measurement within each cell experiment.
-
-### Reference Discharge-Capacity Evolution
-
-The upper panel reports the measured discharge capacity, $`Q_{c,e}`$, for capacity event $`e`$ of cell $`c`$.
-
-- **LFP cells** begin near **2.78 Ah** and decline gradually to approximately **2.45–2.52 Ah**. Their trajectories are smooth and similar, indicating relatively consistent degradation behavior.
-
-- **NMC cells** begin near **3.9 Ah** and decrease steadily to approximately **3.35 Ah**. The two NMC trajectories remain closely aligned throughout the experiment.
-
-- **NCA cells** exhibit greater cell-to-cell variability.  
-  - `NCA_CELL_1` decreases from approximately **2.5 Ah** to **1.7 Ah**.  
-  - `NCA_CELL_2` shows moderate degradation with several local fluctuations.  
-  - `NCA_CELL_3` contains a sharp temporary reduction near segment 500 followed by partial recovery.  
-  - `NCA_CELL_4` displays the most severe decline, decreasing from approximately **2.6 Ah** to below **0.5 Ah**.
-
-### Event-Level State of Health
-
-The lower panel normalizes each capacity measurement by the corresponding cell-specific baseline:
-
-$`\mathrm{SOH}_{c,e}=Q_{c,e}/Q_{c,\mathrm{baseline}}`$.
-
-The dashed horizontal line at $`\mathrm{SOH}=1`$ represents the baseline condition.
-
-- LFP cells retain approximately **89–91%** of their baseline capacity.
-- NMC cells retain approximately **86–87%**.
-- `NCA_CELL_1` declines to approximately **67%**.
-- `NCA_CELL_2` and `NCA_CELL_3` generally remain between approximately **84% and 90%**, except for isolated irregular events.
-- `NCA_CELL_4` declines to approximately **18%**, indicating exceptionally severe capacity loss or a record requiring detailed validation.
-
-Some early SOH values slightly exceed one because the baseline is estimated from several accepted early events rather than necessarily from the single largest capacity observation.
-
-### Main Significance
-
-The figure reveals clear chemistry- and cell-dependent degradation patterns. LFP and NMC cells show comparatively smooth and consistent capacity decline, whereas NCA cells exhibit substantially greater heterogeneity. The abrupt dip and recovery in `NCA_CELL_3` and the extreme decline in `NCA_CELL_4` should be reviewed against segment quality, discharge completeness, temperature, current integration, and event-acceptance criteria before being interpreted solely as physical degradation.
-
-**Figure caption:** Accepted reference-discharge capacity and normalized event-level SOH evolution for eight physical cells. LFP and NMC cells exhibit gradual and consistent degradation, while the NCA group shows stronger cell-to-cell variability, including severe decline in `NCA_CELL_4` and an isolated irregular event in `NCA_CELL_3`.
-
 <img width="1916" height="1431" alt="image" src="https://github.com/user-attachments/assets/8e6585f0-c5bd-4a49-b567-ee6783a42390" />
 
 This figure shows the evolution of accepted reference-discharge capacity events and the corresponding state of health for all eight physical cells. The horizontal axis represents the segment index at which each capacity event occurs and therefore provides the chronological position of the measurement within each cell experiment.
 ### Reference Discharge-Capacity Evolution
 The upper panel reports the measured discharge capacity, $`Q_{c,e}`$, for capacity event $`e`$ of cell $`c`$.
 - **LFP cells** begin near **2.78 Ah** and decline gradually to approximately **2.45–2.52 Ah**. Their trajectories are smooth and similar, indicating relatively consistent degradation behavior.
-
 - **NMC cells** begin near **3.9 Ah** and decrease steadily to approximately **3.35 Ah**. The two NMC trajectories remain closely aligned throughout the experiment.
-
 - **NCA cells** exhibit greater cell-to-cell variability.  
   - `NCA_CELL_1` decreases from approximately **2.5 Ah** to **1.7 Ah**.  
   - `NCA_CELL_2` shows moderate degradation with several local fluctuations.  
@@ -301,7 +259,7 @@ The dashed horizontal line at $`\mathrm{SOH}=1`$ represents the baseline conditi
 - `NCA_CELL_2` and `NCA_CELL_3` generally remain between approximately **84% and 90%**, except for isolated irregular events.
 - `NCA_CELL_4` declines to approximately **18%**, indicating exceptionally severe capacity loss or a record requiring detailed validation.
 
-The figure reveals clear chemistry- and cell-dependent degradation patterns. LFP and NMC cells show comparatively smooth and consistent capacity decline, whereas NCA cells exhibit substantially greater heterogeneity. The abrupt dip and recovery in `NCA_CELL_3` and the extreme decline in `NCA_CELL_4` should be reviewed against segment quality, discharge completeness, temperature, current integration, and event-acceptance criteria before being interpreted solely as physical degradation.
+The figure reveals clear chemistry and cell dependent degradation patterns. LFP and NMC cells show comparatively smooth and consistent capacity decline, whereas NCA cells exhibit substantially greater heterogeneity. The abrupt dip and recovery in `NCA_CELL_3` and the extreme decline in `NCA_CELL_4` should be reviewed against segment quality, discharge completeness, temperature, current integration, and event-acceptance criteria before being interpreted solely as physical degradation.
 
 
 
