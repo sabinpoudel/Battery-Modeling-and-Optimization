@@ -261,6 +261,30 @@ The dashed horizontal line at $`\mathrm{SOH}=1`$ represents the baseline conditi
 
 The figure illustrates clear chemistry and cell dependent degradation patterns. LFP and NMC cells show comparatively smooth and consistent capacity decline, whereas NCA cells exhibit substantially greater heterogeneity. The abrupt dip and recovery in `NCA_CELL_3` and the extreme decline in `NCA_CELL_4` should be reviewed against segment quality, discharge completeness, temperature, current integration, and event-acceptance criteria before being interpreted solely as physical degradation.
 
+###  Chemistry-Specific Monotone OCV–SOC Curves
+<img width="1834" height="1134" alt="image" src="https://github.com/user-attachments/assets/c8cadbd9-b053-49ba-8628-a86f2d50a865" />
+
+This figure compares the fitted open-circuit-voltage relationships for LFP, NCA, and NMC cells. The horizontal axis represents state of charge, while the vertical axis represents open-circuit voltage. The chemistry-specific relationship is written as
+$`V_{\mathrm{OCV}} = f_{\mathrm{chem}}(\mathrm{SOC})`$,
+where $`f_{\mathrm{chem}}`$ is constrained to be nondecreasing. This monotonicity permits stable inverse estimation of SOC from low-current voltage measurements.
+The solid lines show the final monotone OCV–SOC curves, while the transparent points show the fitted voltage observations used during curve construction.
+#### LFP Curve
+The LFP curve extends from approximately **2.6 V** at very low SOC to approximately **3.4 V** near full charge. It contains a long, nearly flat region around **3.2–3.3 V** over much of the SOC interval. 
+#### NCA Curve
+The NCA curve increases from approximately **2.9 V** at low SOC to approximately **4.17 V** at full charge. Compared with LFP, the curve has a more continuous positive slope across the SOC range. The stronger voltage gradient provides greater sensitivity for voltage-based SOC correction. 
+#### NMC Curve
+The calibrated NMC curve begins near SOC **0.20** at approximately **3.66 V** and increases to approximately **4.18 V** at full charge. The curve rises gradually through the middle SOC range and becomes flatter near high SOC before increasing again close to full charge. 
+### Fitted-Observation Deviations
+Several observations lie far from the final monotone curves, including isolated high-voltage points for NCA and NMC. These observations should remain auditable rather than being interpreted automatically as equilibrium OCV values.
+
+The figure confirms that each chemistry requires a separate OCV–SOC mapping. A common curve would incorrectly combine the LFP voltage plateau with the higher and more continuously varying NCA and NMC voltage ranges.
+The monotone curves support:
+- low-current SOC anchoring;
+- inversion from voltage to SOC;
+- chemistry-specific SOC estimation;
+- detection of observations outside the calibrated SOC range;
+- initialization of battery-state estimators.
+
 
 
 
