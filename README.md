@@ -1,3 +1,6 @@
+
+
+
 ## Dataset Acknowledgement
 
 The datasets used in this study were downloaded from the **FairData repository** under the title *“NMC, NCA, and LFP Cells Degradation Under Randomized Current Profiles.”*
@@ -8,8 +11,9 @@ The datasets used in this study were downloaded from the **FairData repository**
 
 Grateful acknowledgement is given to the **New Energy Research Center, Turku University of Applied Sciences, Turku, Finland**, for conducting the battery degradation experiments, collecting the voltage, current, temperature, and operating-profile measurements, and making the raw and processed datasets publicly available through FairData. 
 
-
-## 1. Dataset Composition
+## Pre-Processnig Plots 
+####
+1. Dataset Composition
 
 The downloaded collection contains eight physical lithium-ion cells distributed across three battery chemistries.
 
@@ -127,7 +131,7 @@ The chemistry-specific clusters show that current excitation and voltage respons
 Timestamp decoding is generally successful because parse failures is rare and negative time steps are absent. The principal concern is the high duplicate-timestamp count. Before schema/segement harmonization, duplicate detection can be verified at the segment level to distinguish true repeated timestamps from valid clock resets between experimental segments. The ambient-temperature dataset can be disregarded at this stage. 
 
 
-### Physical-Cell Positive Sampling-Interval Distributions
+#### Physical-Cell Positive Sampling-Interval Distributions
 
 <img width="2189" height="863" alt="image" src="https://github.com/user-attachments/assets/d0411465-062c-4552-8f45-35faa5754005" />
 
@@ -149,7 +153,7 @@ The small deviations around one second are likely caused by timestamp precision,
 <img width="2189" height="881" alt="image" src="https://github.com/user-attachments/assets/da2eeb5d-2576-4bd7-a3b5-381e8da059a1" />
 Empirical cumulative distributions of positive sampling intervals for the LFP, NCA, and NMC OCV references and the ambient-temperature dataset. The overlapping OCV curves indicate uniform one-second sampling, while the ambient data exhibit only negligible deviations around the same nominal interval.
 
-## Calendar-Time Coverage of Decoded Datasets
+#### Calendar-Time Coverage of Decoded Datasets
 <img width="1926" height="881" alt="image" src="https://github.com/user-attachments/assets/30ddefdd-1ca4-495c-9b42-180d9cf8fe51" />
 This timeline summarizes the first and last decoded timestamps of every physical-cell, OCV-reference, and ambient-temperature dataset.
 - **Rows** represent individual timing datasets.
@@ -159,7 +163,7 @@ This timeline summarizes the first and last decoded timestamps of every physical
 Each horizontal line shows only the interval from the first to the last valid timestamp. Most physical-cell experiments span mid-June to late September 2024, while the OCV references occupy short periods in early June. The ambient-temperature record overlaps with most experiments, supporting later temporal alignment.
 
 
-## Standardized Voltage and Source-Current Ranges
+#### Standardized Voltage and Source-Current Ranges
 
 <img width="1921" height="1111" alt="image" src="https://github.com/user-attachments/assets/4e08db59-10b8-4ea9-84ce-90beb9a760b6" />
 The term **standardized** refers to consistent variable names, units, and sign conventions; it does not mean that the signals have been statistically normalized or scaled.
@@ -194,7 +198,7 @@ The terminal voltage consequently increases from approximately **3.1 V** to the 
 
 
 
-## Baseline Capacity and Accepted Reference-Capacity Events
+#### Baseline Capacity and Accepted Reference-Capacity Events
 
 <img width="1958" height="1394" alt="image" src="https://github.com/user-attachments/assets/1cc0df38-f669-4e6e-b48b-4abdc39b7400" />
 
@@ -220,7 +224,7 @@ where $`Q_{c,e}`$ is the measured capacity of event $`e`$ and $`Q_{c,\mathrm{bas
 The lower panel shows the number of accepted reference-discharge events available for each cell.
 The accepted-event counts range from **19** for `NCA_CELL_2` to **28** for `NCA_CELL_4`. Most cells contain between **23 and 27** accepted events, indicating repeated capacity measurements across the degradation experiment. Differences in event count indicate unequal capacity-monitoring coverage. Cells with fewer accepted events may provide lower temporal resolution for degradation and SOH analysis.
 
-### Main Significance
+#### Main Significance
 
 The figure confirms that:
 - baseline capacities are chemistry- and cell-specific;
@@ -232,7 +236,7 @@ The figure confirms that:
 The baseline capacities shown here are preprocessing references. Training-only baselines are reconstructed after chronological data splitting to prevent future capacity information from entering model calibration.
 
 
-## Reference Discharge-Capacity and Event-Level SOH Evolution
+#### Reference Discharge-Capacity and Event-Level SOH Evolution
 
 <img width="1916" height="1431" alt="image" src="https://github.com/user-attachments/assets/8e6585f0-c5bd-4a49-b567-ee6783a42390" />
 
@@ -247,7 +251,7 @@ The upper panel reports the measured discharge capacity, $`Q_{c,e}`$, for capaci
   - `NCA_CELL_3` contains a sharp temporary reduction near segment 500 followed by partial recovery.  
   - `NCA_CELL_4` displays the most severe decline, decreasing from approximately **2.6 Ah** to below **0.5 Ah**.
 
-### Event-Level State of Health
+#### Event-Level State of Health
 The lower panel normalizes each capacity measurement by the corresponding cell-specific baseline:
 $`\mathrm{SOH}_{c,e}=Q_{c,e}/Q_{c,\mathrm{baseline}}`$.
 
@@ -261,7 +265,7 @@ The dashed horizontal line at $`\mathrm{SOH}=1`$ represents the baseline conditi
 
 The figure illustrates clear chemistry and cell dependent degradation patterns. LFP and NMC cells show comparatively smooth and consistent capacity decline, whereas NCA cells exhibit substantially greater heterogeneity. The abrupt dip and recovery in `NCA_CELL_3` and the extreme decline in `NCA_CELL_4` should be reviewed against segment quality, discharge completeness, temperature, current integration, and event-acceptance criteria before being interpreted solely as physical degradation.
 
-###  Chemistry-Specific Monotone OCV–SOC Curves
+####  Chemistry-Specific Monotone OCV–SOC Curves
 <img width="1834" height="1134" alt="image" src="https://github.com/user-attachments/assets/c8cadbd9-b053-49ba-8628-a86f2d50a865" />
 
 This figure compares the fitted open-circuit-voltage relationships for LFP, NCA, and NMC cells. The horizontal axis represents state of charge, while the vertical axis represents open-circuit voltage. The chemistry-specific relationship is written as
@@ -287,7 +291,7 @@ The monotone curves support:
 
 
 
-## Chronological Primary-Split Assignment
+#### Chronological Primary-Split Assignment
 
 <img width="1884" height="919" alt="image" src="https://github.com/user-attachments/assets/8e44a29a-b7d0-4f1c-bf3f-b75df625c138" />
 
@@ -326,7 +330,7 @@ The final test set therefore represents later-life operating conditions that wer
 
 The figure confirms a consistent leakage-free partition structure across LFP, NCA, and NMC cells. Training uses early-life data, calibration uses intermediate-life data, and testing uses the latest available degradation period.
 
-## Primary Split Composition by Physical Cell and Chemistry
+#### Primary Split Composition by Physical Cell and Chemistry
 <img width="1909" height="1426" alt="image" src="https://github.com/user-attachments/assets/b7aeef65-583b-4bfe-a5a8-cd28bc0851aa" />
 
 This figure summarizes the proportion of valid dynamic transitions assigned to the training, calibration, test, and embargo partitions.
@@ -371,7 +375,7 @@ where $`p_{c,r}`$ is the transition fraction assigned to partition $`r`$ for cel
 
 
 
-## LPV Model-Readiness by Physical Cell and Chemistry
+#### LPV Model-Readiness by Physical Cell and Chemistry
 
 <img width="1934" height="1351" alt="image" src="https://github.com/user-attachments/assets/b5c6bbee-e1cd-46e6-83ed-c572cca8c490" />
 
@@ -417,7 +421,7 @@ The figure shows that approximately one-third of the saved observations are suit
 
 
 
-## Ambient-Temperature Alignment Quality
+#### Ambient-Temperature Alignment Quality
 
 <img width="1934" height="1433" alt="image" src="https://github.com/user-attachments/assets/b6d9c355-2a79-44be-b961-cab48415ed76" />
 
@@ -448,7 +452,7 @@ Most cells achieve high valid-match coverage:
 The tolerance-exceeded fraction is largest for `NCA_CELL_2`, at approximately **22%**, indicating weaker temporal overlap with the ambient-temperature record.
 No visible future-match fraction occurs for any cell. This confirms that the alignment procedure preserves temporal causality.
 
-### Distribution of Valid Match Lags
+#### Distribution of Valid Match Lags
 
 The lower panel shows the lag distribution only for successfully matched observations.
 
@@ -462,7 +466,7 @@ The figure confirms that ambient-temperature alignment is predominantly successf
 
 
 
-## LPV-Identification Scheduling-Space Density
+#### LPV-Identification Scheduling-Space Density
 
 <img width="1901" height="618" alt="image" src="https://github.com/user-attachments/assets/fa833476-8e1f-480e-a8c1-fc00ece2eadc" />
 
