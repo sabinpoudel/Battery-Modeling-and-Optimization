@@ -30,19 +30,6 @@ The downloaded collection contains eight physical lithium-ion cells distributed 
 | NMC | `NMC_CELL_1`, `NMC_CELL_2` | 2 |
 | **Total** | — | **8** |
 
-The total number of physical cells is
-
-```math
-N_{\mathrm{cells}}
-=
-2_{\mathrm{LFP}}
-+
-4_{\mathrm{NCA}}
-+
-2_{\mathrm{NMC}}
-=
-8.
-```
 
 Additional reference files include:
 
@@ -130,3 +117,34 @@ N_{\mathrm{NMC}} \\
 ```
 
 The NCA chemistry contributes the largest number of segments because it contains four physical cells, whereas the LFP and NMC groups each contain two cells. 
+
+<img width="1869" height="1404" alt="image" src="https://github.com/user-attachments/assets/83d55d6c-1131-4e4e-9772-79c6974de653" />
+
+
+
+## Observed Voltage, Current, in Downloaded Data 
+
+<img width="1876" height="724" alt="image" src="https://github.com/user-attachments/assets/16be399c-64d6-47e9-a679-4a83c37217a6" />
+
+
+## Segment-level current-span versus voltage-span diversity for LFP, NCA, and NMC cells. 
+
+![Current-span versus voltage-span diversity](figures/step1_current_span_vs_voltage_span.png)
+
+Each point represents one experimental segment. The horizontal axis shows the current span,
+
+\[
+\Delta I_s = I_{\max,s}-I_{\min,s},
+\]
+while the vertical axis shows the corresponding terminal-voltage span,
+\[
+\Delta V_s = V_{\max,s}-V_{\min,s}.
+\]
+
+The figure characterizes the electrical excitation and voltage-response diversity of the three battery chemistries.
+- **LFP segments** are mainly distributed over current spans of approximately \(4\)–\(18\ \mathrm{A}\), with most voltage spans concentrated near \(1.1\ \mathrm{V}\). Several lower-voltage-span segments indicate comparatively mild voltage variation under some operating profiles.
+- **NCA segments** form a dense cluster around current spans of approximately \(6.5\)–\(8\ \mathrm{A}\). Their voltage spans are mostly between \(1.35\) and \(1.50\ \mathrm{V}\), with several segments extending toward \(1.9\ \mathrm{V}\). This indicates relatively consistent current excitation but greater variation in voltage response.
+- **NMC segments** cover the widest current-span range, extending to approximately \(24\ \mathrm{A}\). Most NMC voltage spans are concentrated near \(1.7\ \mathrm{V}\), indicating strong electrical excitation and comparatively broad terminal-voltage variation.
+The chemistry-specific clusters show that current excitation and voltage response are not uniformly distributed across the dataset. NMC provides the broadest current-range coverage, NCA displays a concentrated excitation region with variable voltage response, and LFP generally exhibits lower voltage-span values.
+No clear universal linear relationship appears between current span and voltage span.This figure is descriptive and does not establish measurement validity or causality. 
+The chemistry-specific clusters reveal differences in electrical excitation, voltage-response magnitude, and operating-domain coverage across the raw dataset.
