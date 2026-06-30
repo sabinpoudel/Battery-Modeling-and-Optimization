@@ -365,12 +365,7 @@ The figure confirms that the chronological splitting procedure achieved balanced
 
 The plotted fractions are based on valid dynamic transitions rather than raw rows:
 
-$`
-p_{c,r}
-=
-\frac{N_{c,r}^{\mathrm{transition}}}
-{\sum_{q}N_{c,q}^{\mathrm{transition}}},
-`$
+$` p_{c,r} = \frac{N_{c,r}^{\mathrm{transition}}} {\sum_{q}N_{c,q}^{\mathrm{transition}}},`$
 
 where $`p_{c,r}`$ is the transition fraction assigned to partition $`r`$ for cell $`c`$.
 
