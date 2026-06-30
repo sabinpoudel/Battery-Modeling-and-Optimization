@@ -461,7 +461,6 @@ These observations exceed the review threshold but remain below the 10-second ma
 The figure confirms that ambient-temperature alignment is predominantly successful and strictly causal. Most accepted matches are temporally close to the corresponding battery observations, and no future environmental measurements are introduced.
 
 
-<img width="1901" height="618" alt="image" src="https://github.com/user-attachments/assets/fa833476-8e1f-480e-a8c1-fc00ece2eadc" />
 
 ## LPV-Identification Scheduling-Space Density
 
@@ -490,19 +489,11 @@ The densest region occurs approximately between:
 - transformed current 0.2–0.7.
 Several horizontal bands and curved trajectories are visible, indicating repeated current setpoints together with dynamically changing current profiles. Compared with LFP and NMC, NCA provides the richest excitation diversity for identifying SOC- and current-dependent LPV parameters.
 
-### NMC Scheduling Coverage
+#### NMC Scheduling Coverage
 
-NMC exhibits several dominant horizontal bands near transformed-current values of approximately 0, 0.57, 0.93, and 1.40. A pronounced descending trajectory appears near high SOC. However, the intermediate and low-SOC regions contain substantially less coverage than the corresponding NCA panel.### Modeling Implications
+NMC exhibits several dominant horizontal bands near transformed-current values of approximately 0, 0.57, 0.93, and 1.40. A pronounced descending trajectory appears near high SOC. However, the intermediate and low-SOC regions contain substantially less coverage than the corresponding NCA panel.
 
 The figure demonstrates that the scheduling variables are not sampled uniformly. Identification reliability is expected to be strongest in high-density regions and weaker in black or sparsely populated regions.
-
-This has several consequences:
-
-- parameter estimates should not be interpreted equally across the complete rectangular domain;
-- calibration and test rows outside the training support require explicit extrapolation flags;
-- sparse or regularized LPV basis functions may be preferable to highly flexible unrestricted surfaces;
-- chemistry-specific scheduling domains should be retained;
-- current direction should be considered separately because the plotted current magnitude does not distinguish charging from discharging.
 
 The narrow bands also show that much of the dataset follows predefined experimental current levels. Consequently, apparent coverage over a broad SOC range does not necessarily imply equally broad current excitation at every SOC value.
 
