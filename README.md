@@ -287,5 +287,92 @@ The monotone curves support:
 
 
 
+## Chronological Primary-Split Assignment
+
+<img width="1884" height="919" alt="image" src="https://github.com/user-attachments/assets/8e44a29a-b7d0-4f1c-bf3f-b75df625c138" />
+
+This figure shows the chronological assignment of complete experimental segments to the training, calibration, and test partitions for all eight physical cells.
+
+- **Horizontal axis:** normalized cumulative lifetime progression from 0 to 1.
+- **Vertical axis:** physical-cell identifier.
+- **Blue:** training segments.
+- **Green:** calibration segments.
+- **Red:** test segments.
+- **Each marker:** one complete experimental segment.
+
+For cell \(c\), the normalized lifetime position may be interpreted as
+
+$`\lambda_{c,s}\in[0,1]`$,
+
+where $`\lambda_{c,s}=0`$ represents the beginning of the recorded experiment and $`\lambda_{c,s}=1`$ represents its end.
+All cells follow the required chronological order:
+
+$`\text{training}\rightarrow\text{calibration}\rightarrow\text{testing}`$.
+
+The training partition occupies approximately the first **60%** of each cell lifetime, the calibration partition generally covers the next **20%**, and the test partition covers the final **20%**.The exact split boundaries differ slightly among cells because partition selection is based on complete segments or aging epochs and valid transition counts rather than cutting individual rows at fixed percentages. This preserves experimental integrity and prevents one trajectory from appearing in more than one partition.No calibration or test segment appears before the training region, and no training segment reappears after calibration begins. Similarly, test segments occur only after the calibration region. This confirms chronological exclusivity. Small visible gaps, particularly in several NCA trajectories, may represent spacing between normalized segment positions, excluded or embargoed units, or uneven experimental coverage. They should not automatically be interpreted as deleted observations.
+
+#### Leakage-Control Significance
+
+Random row-level splitting would allow temporally adjacent samples from the same experiment to appear in both training and testing data. Such overlap would produce optimistic performance estimates.
+
+The chronological segment-level split prevents:
+
+- samples from one segment entering multiple partitions;
+- future degradation states influencing training;
+- aging epochs being shared across partitions;
+- calibration or test information being used to construct training features.
+
+The final test set therefore represents later-life operating conditions that were unavailable during model fitting.
+
+The figure confirms a consistent leakage-free partition structure across LFP, NCA, and NMC cells. Training uses early-life data, calibration uses intermediate-life data, and testing uses the latest available degradation period.
+
+## Primary Split Composition by Physical Cell and Chemistry
+<img width="1909" height="1426" alt="image" src="https://github.com/user-attachments/assets/b7aeef65-583b-4bfe-a5a8-cd28bc0851aa" />
+
+This figure summarizes the proportion of valid dynamic transitions assigned to the training, calibration, test, and embargo partitions.
+
+#### Physical-Cell Composition
+
+The upper panel reports the split composition for each of the eight physical cells. Every stacked bar sums to one and therefore represents the complete set of valid transitions for that cell.
+The achieved proportions are close to the intended chronological allocation:
+
+- approximately **60–62%** for training;
+- approximately **18–22%** for calibration;
+- approximately **18–21%** for testing;
+- a negligible or zero visible fraction for embargo.
+
+The small differences among cells arise because partition boundaries are selected using complete experimental segments or aging epochs rather than cutting individual samples at exact percentage thresholds. NCA_CELL_2` and `NCA_CELL_4` contain slightly larger training shares, while some other cells contain marginally larger calibration or test shares. These differences are small and do not indicate substantial partition imbalance.
+
+#### Chemistry-Level Composition
+
+The lower panel aggregates valid transitions across all cells within each chemistry. The chemistry-level proportions remain close to the target structure:
+
+$`\text{Training} \approx 60\%`$,
+
+$`\text{Calibration} \approx 20\%`$,
+
+and
+
+$`\text{Testing} \approx 20\%`$.
+
+LFP, NCA, and NMC therefore contribute comparable relative proportions to each partition despite differences in the number of physical cells, experimental segments, and total samples.
+
+#### Embargo Interpretation
+
+Although embargo is included in the legend, no substantial orange region is visible. This indicates that the saved primary split either contains no embargo transitions or contains a fraction too small to be visually distinguishable. The absence of a large embargo region does not imply data leakage. Leakage prevention is primarily achieved through chronological ordering, segment-level assignment, and aging-epoch exclusivity.
+
+The figure confirms that the chronological splitting procedure achieved balanced training, calibration, and test coverage at both the cell and chemistry levels. This supports fair cross-cell and cross-chemistry model comparison while preserving complete experimental units.
+
+The plotted fractions are based on valid dynamic transitions rather than raw rows:
+
+$`
+p_{c,r}
+=
+\frac{N_{c,r}^{\mathrm{transition}}}
+{\sum_{q}N_{c,q}^{\mathrm{transition}}},
+`$
+
+where $`p_{c,r}`$ is the transition fraction assigned to partition $`r`$ for cell $`c`$.
+
 
  
