@@ -1610,4 +1610,1283 @@ $$\rho_1=\frac{\sum_{i=1}^{N-1}\widetilde{e}_{i-1}\widetilde{e}_i}{\sum_{i=0}^{N
 **(103)**
 
 
+## Residual Operating-Regime Analysis
+
+The code classifies current as follows.
+
+For charging:
+
+$$
+g_I(I)=\mathrm{CHARGE},
+\qquad
+I<-0.05.
+$$
+
+For rest:
+
+$$
+g_I(I)=\mathrm{REST},
+\qquad
+|I|\le0.05.
+$$
+
+For discharging:
+
+$$
+g_I(I)=\mathrm{DISCHARGE},
+\qquad
+I>0.05.
+$$
+
+**(104)**
+
+SOC is divided into:
+
+- $z<0$;
+- ten intervals of width $0.1$;
+- $z\ge1$.
+
+Temperature is divided into:
+
+- $T<0\,^{\circ}\mathrm{C}$;
+- $0\le T<10\,^{\circ}\mathrm{C}$;
+- $10\le T<20\,^{\circ}\mathrm{C}$;
+- $20\le T<30\,^{\circ}\mathrm{C}$;
+- $30\le T<40\,^{\circ}\mathrm{C}$;
+- $T\ge40\,^{\circ}\mathrm{C}$.
+
+Residual dependence is evaluated against:
+
+$$
+I,\ z,\ T,\ t.
+$$
+
+---
+
+## 28. Correlation and Slope Calculation
+
+For operating variable $x_i$, the code accumulates sufficient statistics.
+
+Define
+
+$$
+S_{xx}
+=
+N\sum_i x_i^2
+-
+\left(
+\sum_i x_i
+\right)^2.
+$$
+
+**(105)**
+
+Define
+
+$$
+S_{ee}
+=
+N\sum_i e_i^2
+-
+\left(
+\sum_i e_i
+\right)^2.
+$$
+
+**(106)**
+
+Define
+
+$$
+S_{xe}
+=
+N\sum_i x_i e_i
+-
+\left(
+\sum_i x_i
+\right)
+\left(
+\sum_i e_i
+\right).
+$$
+
+**(107)**
+
+The residual slope is
+
+$$
+\beta_{e\mid x}
+=
+\frac{S_{xe}}{S_{xx}},
+$$
+
+**(108)**
+
+when $S_{xx}>0$.
+
+The Pearson correlation is
+
+$$
+\rho_{e,x}
+=
+\frac{S_{xe}}
+{\sqrt{S_{xx}S_{ee}}},
+$$
+
+**(109)**
+
+when the denominator is positive.
+
+The value is clipped numerically to
+
+$$
+[-1,1].
+$$
+
+The maximum residual dependence used in final decisions is
+
+$$
+\rho_{\max}
+=
+\max
+\left(
+|\rho_{e,I}|,
+|\rho_{e,z}|,
+|\rho_{e,T}|,
+|\rho_{e,t}|
+\right).
+$$
+
+**(110)**
+
+## Practical-Identifiability Analysis
+
+Identifiability is evaluated using the weighted training residual vector:
+
+$$
+r(\xi).
+$$
+
+The numerical Jacobian is
+
+$$
+J
+=
+\left.
+\frac{\partial r}{\partial \xi^T}
+\right|_{\xi=\widehat{\xi}}.
+$$
+
+**(111)**
+
+For transformed parameter $\xi_j$, the proposed finite-difference step is
+
+$$
+h_j
+=
+\max
+\left[
+10^{-6},
+10^{-4}\max
+\left(
+1,
+|\widehat{\xi}_j|
+\right)
+\right].
+$$
+
+**(112)**
+
+When both sides are sufficiently far from the bounds, the code uses a central difference:
+
+$$
+J_{:,j}
+\approx
+\frac{
+r(\widehat{\xi}+h_je_j)
+-
+r(\widehat{\xi}-h_je_j)
+}{
+2h_j
+}.
+$$
+
+**(113)**
+
+The step may be reduced to 45% of the available distance to either bound.
+
+Near a bound, a one-sided forward or backward difference is used.
+
+---
+
+## 30. Singular-Value and Rank Diagnostics
+
+The code computes
+
+$$
+J
+=
+U\Sigma W^T.
+$$
+
+**(114)**
+
+where
+
+$$
+\Sigma
+=
+\mathrm{diag}
+(\sigma_1,\ldots,\sigma_p),
+\qquad
+\sigma_1\ge\cdots\ge\sigma_p.
+$$
+
+The numerical-rank tolerance is
+
+$$
+\varepsilon_{\mathrm{num}}
+=
+\max(N,p)\,
+\varepsilon_{\mathrm{mach}}\,
+\sigma_1.
+$$
+
+**(115)**
+
+The practical tolerance is
+
+$$
+\varepsilon_{\mathrm{prac}}
+=
+10^{-6}\sigma_1.
+$$
+
+**(116)**
+
+Practical rank is
+
+$$
+r_{\mathrm{prac}}
+=
+\#\{j:\sigma_j>\varepsilon_{\mathrm{prac}}\}.
+$$
+
+**(117)**
+
+The condition number is
+
+$$
+\kappa_J
+=
+\frac{\sigma_1}{\sigma_p}.
+$$
+
+**(118)**
+
+When the smallest singular value is zero or numerically unusable, the condition number is treated as nonfinite.
+
+---
+
+## 31. Local Covariance and Parameter Correlations
+
+The information matrix is
+
+$$
+I
+=
+J^TJ.
+$$
+
+**(119)**
+
+The weighted residual sum of squares is
+
+$$
+\mathrm{RSS}
+=
+r^Tr.
+$$
+
+**(120)**
+
+With degrees of freedom
+
+$$
+\nu
+=
+N-r_{\mathrm{prac}},
+$$
+
+**(121)**
+
+the residual-variance estimate is
+
+$$
+\sigma_r^2
+=
+\frac{\mathrm{RSS}}{\nu}.
+$$
+
+**(122)**
+
+The transformed-parameter covariance approximation is
+
+$$
+\Sigma_\xi
+=
+\sigma_r^2
+(J^TJ)^+.
+$$
+
+**(123)**
+
+The standard error is
+
+$$
+\mathrm{SE}(\xi_j)
+=
+\sqrt{
+[\Sigma_\xi]_{jj}
+}.
+$$
+
+**(124)**
+
+The transformed-parameter correlation is
+
+$$
+\mathrm{Corr}(\xi_i,\xi_j)
+=
+\frac{
+[\Sigma_\xi]_{ij}
+}{
+\sqrt{
+[\Sigma_\xi]_{ii}
+[\Sigma_\xi]_{jj}
+}
+}.
+$$
+
+**(125)**
+
+---
+
+## 32. Physical-Parameter Uncertainty
+
+Let
+
+$$
+\vartheta
+=
+g(\xi)
+$$
+
+be the decoded physical-parameter vector.
+
+For one-RC:
+
+$$
+\vartheta_1
+=
+\begin{bmatrix}
+R_0 &
+R_1 &
+\tau_1 &
+C_1
+\end{bmatrix}^T.
+$$
+
+**(126)**
+
+For two-RC:
+
+$$
+\vartheta_2
+=
+\begin{bmatrix}
+R_0 &
+R_1 &
+R_2 &
+\tau_1 &
+\tau_2 &
+\tau_{\mathrm{gap}} &
+C_1 &
+C_2
+\end{bmatrix}^T.
+$$
+
+**(127)**
+
+Let
+
+$$
+G
+=
+\frac{\partial g}{\partial \xi^T}.
+$$
+
+**(128)**
+
+The physical covariance is computed by the delta method:
+
+$$
+\Sigma_\vartheta
+=
+G\Sigma_\xi G^T.
+$$
+
+**(129)**
+
+The relative standard error is
+
+$$
+\mathrm{RSE}(\vartheta_j)
+=
+\frac{
+\sqrt{
+[\Sigma_\vartheta]_{jj}
+}
+}{
+|\vartheta_j|
+}.
+$$
+
+**(130)**
+
+---
+
+## 33. Bound-Proximity Diagnostic
+
+For transformed parameter $\xi_j$ with lower and upper bounds $\ell_j$ and $u_j$, define the normalized distances:
+
+$$
+d_j^L
+=
+\frac{
+\widehat{\xi}_j-\ell_j
+}{
+u_j-\ell_j
+},
+$$
+
+**(131)**
+
+and
+
+$$
+d_j^U
+=
+\frac{
+u_j-\widehat{\xi}_j
+}{
+u_j-\ell_j
+}.
+$$
+
+**(132)**
+
+The minimum relative distance is
+
+$$
+d_j^{\min}
+=
+\min
+(d_j^L,d_j^U).
+$$
+
+**(133)**
+
+A parameter is considered near a bound when
+
+$$
+d_j^{\min}
+\le
+0.01.
+$$
+
+**(134)**
+
+---
+
+## 34. Identifiability Classification
+
+A model is classified `RANK_DEFICIENT` when
+
+$$
+r_{\mathrm{prac}}
+<
+p.
+$$
+
+**(135)**
+
+For a practically full-rank model, severe weakness exists if any of the following holds:
+
+$$
+\kappa_J
+>
+10^6,
+$$
+
+**(136)**
+
+$$
+\max_{i\ne j}
+|\mathrm{Corr}(\xi_i,\xi_j)|
+\ge
+0.99,
+$$
+
+**(137)**
+
+or
+
+$$
+\max_j
+\mathrm{RSE}(\vartheta_j)
+\ge
+1.
+$$
+
+**(138)**
+
+The corresponding classification is:
+
+`FULL_RANK_BUT_WEAK`
+
+Moderate concern exists when any of the following holds:
+
+$$
+\kappa_J
+>
+10^4,
+$$
+
+**(139)**
+
+$$
+\max_{i\ne j}
+|\mathrm{Corr}(\xi_i,\xi_j)|
+\ge
+0.95,
+$$
+
+**(140)**
+
+$$
+\max_j
+\mathrm{RSE}(\vartheta_j)
+\ge
+0.50,
+$$
+
+**(141)**
+
+or at least one parameter is near a bound.
+
+The corresponding classification is:
+
+`FULL_RANK_MODERATE`
+
+Otherwise, the model is classified:
+
+`FULL_RANK_STABLE`
+
+---
+
+## 35. Exact Objective Profiles
+
+The code evaluates exact nonlinear objective slices using training residuals only.
+
+The multiplier grid is
+
+$$
+m
+\in
+\{
+-2,
+-1.5,
+-1,
+-0.5,
+0,
+0.5,
+1,
+1.5,
+2
+\}.
+$$
+
+**(142)**
+
+### 35.1 Parameter-Axis Direction
+
+For transformed parameter $j$,
+
+$$
+\xi_j(m)
+=
+\widehat{\xi}
++
+ms_je_j.
+$$
+
+**(143)**
+
+### 35.2 Weakest Joint Direction
+
+Let $v_{\min}$ be the right singular vector associated with the weakest information direction.
+
+The code gives it a deterministic sign by making its largest absolute component positive.
+
+The weak-direction profile is
+
+$$
+\xi_w(m)
+=
+\widehat{\xi}
++
+ms_wv_{\min}.
+$$
+
+**(144)**
+
+The direction is normalized to unit Euclidean norm.
+
+The scale is reduced as needed so that every profile point remains inside the transformed bounds.
+
+## 36. Exact and Linearized Profile Objectives
+
+For perturbation
+
+$$\Delta\xi=msd,$$
+
+**(145)**
+
+the exact weighted residual is
+
+$$r_{\mathrm{exact}}(m)=r(\widehat{\xi}+\Delta\xi).$$
+
+**(146)**
+
+The local linearized residual is
+
+$$r_{\mathrm{lin}}(m)=r_0+J\Delta\xi.$$
+
+**(147)**
+
+The exact weighted residual sum of squares is
+
+$$\mathrm{RSS}_{\mathrm{exact}}(m)=r_{\mathrm{exact}}(m)^T r_{\mathrm{exact}}(m).$$
+
+**(148)**
+
+The exact Huber objective is
+
+$$H_{\mathrm{exact}}(m)=\sum_i \ell_{0.020}\bigl(r_{\mathrm{exact},i}(m)\bigr).$$
+
+**(149)**
+
+The change in residual sum of squares is
+
+$$\Delta\mathrm{RSS}(m)=\mathrm{RSS}_{\mathrm{exact}}(m)-\mathrm{RSS}_0.$$
+
+**(150)**
+
+The likelihood-ratio-style statistic is
+
+$$\Lambda(m)=\frac{\Delta\mathrm{RSS}(m)}{\sigma_r^2}.$$
+
+**(151)**
+
+The relative change in the Huber objective is
+
+$$\Delta H_{\mathrm{rel}}(m)=\frac{H_{\mathrm{exact}}(m)-H_0}{H_0}.$$
+
+**(152)**
+
+These are conditional slices. Other parameters remain fixed; the code does not reoptimize nuisance parameters at each profile point.
+
+## 37. Objective-Profile Classification
+
+A profile is classified `CENTER_NOT_SLICE_MINIMUM` when a noncentral point has a lower Huber objective than the frozen center beyond tolerance.
+
+Otherwise, define
+
+$$
+\Lambda_{\mathrm{outer}}
+=
+\min_{|m|=2}
+\Lambda(m).
+$$
+
+**(153)**
+
+The profile is classified `VERY_FLAT` when
+
+$$
+\Lambda_{\mathrm{outer}}<0.25.
+$$
+
+**(154)**
+
+The profile is classified `WEAK` when
+
+$$
+0.25
+\le
+\Lambda_{\mathrm{outer}}
+<
+1.
+$$
+
+**(155)**
+
+The profile is classified `MODERATE` when
+
+$$
+1
+\le
+\Lambda_{\mathrm{outer}}
+<
+4.
+$$
+
+**(156)**
+
+The profile is classified `SHARP` when
+
+$$
+\Lambda_{\mathrm{outer}}
+\ge
+4.
+$$
+
+**(157)**
+
+The executed notebook evaluates:
+
+- 32 parameter-axis directions;
+- 288 parameter-axis profile rows;
+- 72 weakest-direction profile rows.
+
+- ## 38. Exact Trajectory-Block Bootstrap
+
+The bootstrap operates only on training trajectories.
+
+Let the base weighted residual vector be divided into trajectory blocks:
+
+$$
+r
+=
+\left(
+r_1^T,
+r_2^T,
+\ldots,
+r_S^T
+\right)^T.
+$$
+
+**(158)**
+
+For bootstrap replicate $b$, the code draws $S$ trajectory indices with replacement:
+
+$$
+s_1^{(b)},
+s_2^{(b)},
+\ldots,
+s_S^{(b)}.
+$$
+
+**(159)**
+
+The bootstrap residual vector is formed by direct residual-block indexing:
+
+$$
+r^{(b)}(\xi)
+=
+\left(
+r_{s_1^{(b)}}(\xi)^T,
+r_{s_2^{(b)}}(\xi)^T,
+\ldots,
+r_{s_S^{(b)}}(\xi)^T
+\right)^T.
+$$
+
+**(160)**
+
+If a trajectory is sampled twice, its complete residual block appears twice.
+
+This is an exact block-resampling implementation for the robust objective; it is not a sample-level independent bootstrap.
+
+Each bootstrap estimate solves
+
+$$
+\widehat{\xi}^{(b)}
+=
+\underset{\xi}{\arg\min}
+\sum_i
+\ell_{0.020}
+\left(
+r_i^{(b)}(\xi)
+\right).
+$$
+
+**(161)**
+
+The frozen estimate initializes each bootstrap fit.
+
+The full run uses
+
+$$
+B=30
+$$
+
+replicates for each of eight candidates, giving
+
+$$
+8\times30=240
+$$
+
+bootstrap refits.
+
+## 39. Bootstrap Optimizer
+
+The primary bootstrap optimization uses:
+
+- trust-region reflective method, `trf`;
+- two-point finite-difference Jacobian;
+- Huber scale of $0.020\ \mathrm{V}$;
+- Jacobian-based parameter scaling;
+- a maximum of 300 function evaluations;
+- optimization tolerances of $10^{-8}$.
+
+When the first attempt does not report success, the code performs a fallback fit using:
+
+- the first estimate as the starting point when it is finite;
+- three-point finite differences;
+- unit parameter scaling;
+- up to 600 function evaluations;
+- tolerances no tighter than $10^{-7}$.
+
+A finite, physically valid result can be retained as usable even when the optimizer success flag is false. Usability and formal convergence are reported separately.
+
+---
+
+## 40. Bootstrap Statistics
+
+For parameter $\theta_j$, using $B_u$ usable bootstrap replicates, the bootstrap mean is
+
+$$
+\theta_j^*
+=
+\frac{1}{B_u}
+\sum_{b=1}^{B_u}
+\theta_j^{(b)}.
+$$
+
+**(162)**
+
+Bootstrap bias is
+
+$$
+\mathrm{Bias}_j^*
+=
+\theta_j^*
+-
+\theta_j.
+$$
+
+**(163)**
+
+Relative bootstrap bias is
+
+$$
+\mathrm{RBias}_j^*
+=
+\frac{
+\mathrm{Bias}_j^*
+}{
+|\theta_j|
+}.
+$$
+
+**(164)**
+
+Bootstrap standard deviation is
+
+$$
+s_j^*
+=
+\sqrt{
+\frac{1}{B_u-1}
+\sum_{b=1}^{B_u}
+\left(
+\theta_j^{(b)}
+-
+\theta_j^*
+\right)^2
+}.
+$$
+
+**(165)**
+
+Relative bootstrap standard deviation is
+
+$$
+\mathrm{RSD}_j^*
+=
+\frac{
+s_j^*
+}{
+|\theta_j|
+}.
+$$
+
+**(166)**
+
+The percentile interval is
+
+$$
+\left[
+q_{0.025}
+\left(
+\theta_j^{(b)}
+\right),
+q_{0.975}
+\left(
+\theta_j^{(b)}
+\right)
+\right].
+$$
+
+**(167)**
+
+Near-bound frequency is
+
+$$
+f_{j,\mathrm{bound}}^*
+=
+\frac{1}{B_u}
+\sum_{b=1}^{B_u}
+1
+\left(
+d_{j,b}^{\min}
+\le
+0.01
+\right).
+$$
+
+**(168)**
+
+---
+
+## 41. Bootstrap Stability Classification
+
+The minimum usable fraction is
+
+$$
+f_{\mathrm{usable}}
+\ge
+0.80.
+$$
+
+**(169)**
+
+The minimum converged fraction is
+
+$$
+f_{\mathrm{conv}}
+\ge
+0.50.
+$$
+
+**(170)**
+
+A candidate is classified `STABLE` when
+
+$$
+\max_j
+\mathrm{RSD}_j^*
+\le
+0.20,
+$$
+
+**(171)**
+
+and
+
+$$
+\max_j
+f_{j,\mathrm{bound}}^*
+\le
+0.20.
+$$
+
+**(172)**
+
+A candidate is classified `MODERATE` when
+
+$$
+\max_j
+\mathrm{RSD}_j^*
+\le
+0.50,
+$$
+
+**(173)**
+
+and the maximum near-bound frequency remains at most $0.20$.
+
+Otherwise, the candidate is classified `WEAK`.
+
+---
+
+## 42. Final Acceptance Thresholds
+
+The exact final thresholds are:
+
+| Diagnostic | Warning | Rejection or severe level |
+|---|---:|---:|
+| Ordinary-test pooled RMSE | $0.030\ \mathrm{V}$ | $0.050\ \mathrm{V}$ |
+| Strict-test pooled RMSE | $0.050\ \mathrm{V}$ | $0.075\ \mathrm{V}$ |
+| Absolute pooled bias | $0.010\ \mathrm{V}$ | $0.020\ \mathrm{V}$ |
+| Maximum residual correlation | $0.25$ | $0.50$, severe warning |
+| Transformed-parameter correlation | $0.95$ | — |
+| Physical relative standard error | $0.50$ | $1.00$, severe warning |
+| Bootstrap usable fraction | — | below $0.80$, hard failure |
+| Bootstrap converged fraction | below $0.50$ | warning |
+| Bootstrap relative standard deviation | $0.50$ | $1.00$, severe warning |
+
+Residual correlation above $0.50$ is treated as a severe warning, not as an independent hard failure.
+
+---
+
+## 43. Hard-Failure Logic
+
+A hard failure is generated when any of the following occurs:
+
+- frozen parameters violate physical constraints;
+- ordinary-test samples are absent;
+- ordinary-test RMSE exceeds $0.050\ \mathrm{V}$;
+- ordinary-test absolute bias exceeds $0.020\ \mathrm{V}$;
+- strict-test RMSE exceeds $0.075\ \mathrm{V}$;
+- strict-test absolute bias exceeds $0.020\ \mathrm{V}$;
+- practical Jacobian rank is below the parameter count;
+- identifiability status is `RANK_DEFICIENT`;
+- a parameter-axis profile has a lower noncentral objective;
+- the weakest-direction profile has a lower noncentral objective;
+- bootstrap usable fraction is below $0.80$.
+
+Warnings are generated for:
+
+- elevated but nonrejection predictive errors;
+- residual dependence;
+- high condition number;
+- strong parameter correlation;
+- high relative uncertainty;
+- near-bound parameter estimates;
+- flat objective profiles;
+- high bootstrap variability;
+- low bootstrap convergence.
+
+---
+
+## 44. Final Decision and Score
+
+Let $H$ be the number of unique hard-failure reasons and $W$ be the number of unique warning reasons.
+
+The decision is `REJECT` when
+
+$$
+H>0.
+$$
+
+The decision is `ACCEPT_WITH_CAUTION` when
+
+$$
+H=0
+\quad\text{and}\quad
+W>0.
+$$
+
+The decision is `ACCEPT` when
+
+$$
+H=0
+\quad\text{and}\quad
+W=0.
+$$
+
+**(174)**
+
+The acceptance score is
+
+$$
+A
+=
+\min
+\left(
+100,
+\max
+\left(
+0,
+100-30H-5W
+\right)
+\right).
+$$
+
+**(175)**
+
+A high score cannot override a hard failure. Any hard failure forces rejection.
+
+## 45. Final Executed Candidate Results
+
+The final executed candidate table reports:
+
+| Scope | Order | Test RMSE | Test bias | Strict-test RMSE | Maximum test residual correlation | Practical rank | Parameter count | Final decision |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| Global | 1RC | 0.431969 V | 0.167777 V | 0.605432 V | 0.908850 | 3 | 3 | `REJECT` |
+| Global | 2RC | 0.431971 V | 0.167780 V | 0.605449 V | 0.908849 | 4 | 5 | `REJECT` |
+| LFP | 1RC | 0.164429 V | 0.020858 V | 0.392642 V | 0.732742 | 3 | 3 | `REJECT` |
+| LFP | 2RC | 0.164360 V | 0.020995 V | 0.392646 V | 0.734132 | 5 | 5 | `REJECT` |
+| NCA | 1RC | 0.528546 V | 0.256501 V | 0.629874 V | 0.908469 | 3 | 3 | `REJECT` |
+| NCA | 2RC | 0.528548 V | 0.256503 V | 0.629890 V | 0.908467 | 4 | 5 | `REJECT` |
+| NMC | 1RC | 0.240987 V | 0.036885 V | 0.520619 V | 0.824230 | 3 | 3 | `REJECT` |
+| NMC | 2RC | 0.402613 V | 0.110771 V | 0.520990 V | 0.932332 | 5 | 5 | `REJECT` |
+
+Every ordinary-test RMSE exceeds
+
+$$
+0.050\ \text{V}.
+$$
+
+Every strict-test RMSE exceeds
+
+$$
+0.075\ \text{V}.
+$$
+
+Therefore, every candidate has at least two predictive hard failures before considering identifiability, objective profiles, or bootstrap stability.
+
+---
+
+## 46. Executed Identifiability Results
+
+The code reports:
+
+| Candidate | Practical rank | Parameter count | Condition number | Status |
+|---|---:|---:|---:|---|
+| Global 1RC | 3 | 3 | 1.9450 × 10⁴ | `FULL_RANK_BUT_WEAK` |
+| Global 2RC | 4 | 5 | 5.2732 × 10⁷ | `RANK_DEFICIENT` |
+| LFP 1RC | 3 | 3 | 4.1798 × 10⁴ | `FULL_RANK_BUT_WEAK` |
+| LFP 2RC | 5 | 5 | 2.7733 × 10⁴ | `FULL_RANK_BUT_WEAK` |
+| NCA 1RC | 3 | 3 | 6.8383 × 10³ | `FULL_RANK_BUT_WEAK` |
+| NCA 2RC | 4 | 5 | 2.8883 × 10⁸ | `RANK_DEFICIENT` |
+| NMC 1RC | 3 | 3 | 6.2259 × 10² | `FULL_RANK_BUT_WEAK` |
+| NMC 2RC | 5 | 5 | 4.3986 × 10² | `FULL_RANK_BUT_WEAK` |
+
+The global two-RC and NCA two-RC models are practically rank deficient.
+
+The other six models are full rank but classified as weak because of severe transformed-parameter correlation or large physical-parameter uncertainty.
+
+---
+
+## 47. Executed Objective-Profile Results
+
+The weakest joint direction is classified as
+
+`VERY_FLAT`
+
+for all eight candidates.
+
+The dominant weak directions include:
+
+- compensation between $\log R_0$ and $\log R_1$ in several one-RC models;
+- compensation between $\log R_1$ and $\log R_2$ in the global and NCA two-RC models;
+- a weak direction dominated by $\log \tau_1$ and $\log R_1$ for the NMC two-RC model.
+
+The NMC two-RC parameter-axis analysis also produces a
+
+`CENTER_NOT_SLICE_MINIMUM`
+
+result, creating an additional hard failure.
+
+---
+
+## 48. Executed Bootstrap Results
+
+The code performs all
+
+$$
+240
+$$
+
+planned bootstrap refits.
+
+For the displayed final decision table:
+
+$$
+f_{\text{usable}}=1.0
+$$
+
+and
+
+$$
+f_{\text{conv}}=1.0
+$$
+
+for all eight candidates.
+
+Therefore, the bootstrap procedure itself completes successfully.
+
+However, every candidate receives the bootstrap stability classification
+
+`WEAK`.
+
+The weakness is caused by large physical-parameter variability or frequent proximity to parameter bounds, not by an insufficient number of usable bootstrap runs.
+
+For example, the NCA two-RC time-constant gap has a relative bootstrap standard deviation exceeding
+
+$$
+2.09,
+$$
+
+meaning that its bootstrap standard deviation is more than twice the magnitude of the frozen estimate.
+
+---
+
+## 49. Final Executed Decisions
+
+The final output is:
+
+| Decision class | Number of candidates |
+|---|---:|
+| `ACCEPT` | 0 |
+| `ACCEPT_WITH_CAUTION` | 0 |
+| `REJECT` | 8 |
+
+The candidate-level results are:
+
+| Candidate | Hard failures | Warnings | Acceptance score | Decision |
+|---|---:|---:|---:|---|
+| Global 1RC | 4 | 9 | 0 | `REJECT` |
+| Global 2RC | 6 | 10 | 0 | `REJECT` |
+| LFP 1RC | 4 | 9 | 0 | `REJECT` |
+| LFP 2RC | 4 | 9 | 0 | `REJECT` |
+| NCA 1RC | 4 | 9 | 0 | `REJECT` |
+| NCA 2RC | 6 | 10 | 0 | `REJECT` |
+| NMC 1RC | 4 | 9 | 0 | `REJECT` |
+| NMC 2RC | 5 | 8 | 0 | `REJECT` |
+
+The chemistry-level best available fixed candidates are:
+
+| Chemistry | Best available fixed candidate | Outcome |
+|---|---|---|
+| LFP | LFP-specific 2RC | `REJECTED` |
+| NCA | Global 1RC | `REJECTED` |
+| NMC | NMC-specific 1RC | `REJECTED` |
+
+The primary chemistry-specific two-RC baseline is rejected for all three chemistries.
+
 
