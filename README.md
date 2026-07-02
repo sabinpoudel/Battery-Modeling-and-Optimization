@@ -505,10 +505,6 @@ NCA provides the broadest two-dimensional excitation coverage, while LFP and NMC
 
 
 
-
-
-
-
 # Notebook 11
 
 ## Introduction
@@ -601,17 +597,13 @@ Classify each frozen model as:
 
 Let
 
-$$
-s=1,\ldots,S
-$$
+$$s=1,\ldots,S$$
 
 index trajectories or experimental segments.
 
 Within trajectory $s$, let
 
-$$
-k=0,\ldots,N_s-1
-$$
+$$k=0,\ldots,N_s-1$$
 
 index samples.
 
@@ -625,31 +617,19 @@ The code uses:
 
 The sampling interval is
 
-$$
-\Delta t_{s,k}
-=
-t_{s,k+1}-t_{s,k},
-\qquad
-k=0,\ldots,N_s-2.
-$$
+$$\Delta t_{s,k}=t_{s,k+1}-t_{s,k},\qquad k=0,\ldots,N_s-2.$$
 
 **(1)**
 
 The code requires
 
-$$
-\Delta t_{s,k}>0.
-$$
+$$\Delta t_{s,k}>0.$$
 
 **(2)**
 
 The current convention is explicitly fixed as
 
-$$
-I_{s,k}>0
-\iff
-\mathrm{discharge}.
-$$
+$$I_{s,k}>0\iff\mathrm{discharge}.$$
 
 **(3)**
 
@@ -671,54 +651,39 @@ Every trajectory also has:
 
 Let the primary split be
 
-$$
-p(s)\in
-\{\mathrm{train},\mathrm{calibration},\mathrm{test}\}.
-$$
+$$p(s)\in\{\mathrm{train},\mathrm{calibration},\mathrm{test}\}.$$
 
 **(4)**
 
 Let
 
-$$
-q_s^{\mathrm{strict}}\in\{0,1\}
-$$
+$$q_s^{\mathrm{strict}}\in\{0,1\}$$
 
 indicate strict-test membership.
 
 When $q_s^{\mathrm{strict}}=1$,
 
-$$
-\pi(s)=\mathrm{strict\_test}.
-$$
+$$\pi(s)=\mathrm{strict\_test}.$$
 
 When $q_s^{\mathrm{strict}}=0$,
 
-$$
-\pi(s)=p(s).
-$$
+$$\pi(s)=p(s).$$
 
 **(5)**
 
 A fitting trajectory must satisfy all of the following:
 
-$$
-p(s)\in\{\mathrm{train},\mathrm{calibration}\},
-$$
+$$p(s)\in\{\mathrm{train},\mathrm{calibration}\},$$
 
 **(6)**
 
-$$
-q_s^{\mathrm{strict}}=0,
-$$
+$$q_s^{\mathrm{strict}}=0,$$
 
 **(7)**
 
 and
 
-$$
-e_s^{\mathrm{SOC}}=1.
-$$
+$$e_s^{\mathrm{SOC}}=1.$$
 
 **(8)**
 
@@ -730,7 +695,7 @@ No strict-test trajectory is permitted in either fitting dataset.
 
 ---
 
-## Executed Data Volume
+## 7. Executed Data Volume
 
 The executed notebook reports:
 
@@ -760,52 +725,23 @@ The global dataset is the concatenation of the three chemistry-specific selectio
 
 For chemistry $c$, the code stores a validated forward OCV grid:
 
-$$
-\{z_j^{(c)},U_j^{(c)}\}_{j=1}^{M_c}.
-$$
+$$\{z_j^{(c)},U_j^{(c)}\}_{j=1}^{M_c}.$$
 
 The forward OCV calculation is implemented by linear interpolation:
 
-$$
-U_{\mathrm{oc}}^{(c)}(z)
-=
-\mathrm{interp}
-\bigl(
-z;
-z_{\mathrm{grid}}^{(c)},
-U_{\mathrm{grid}}^{(c)}
-\bigr).
-$$
+$$U_{\mathrm{oc}}^{(c)}(z)=\mathrm{interp}(z;z_{\mathrm{grid}}^{(c)},U_{\mathrm{grid}}^{(c)}).$$
 
 **(9)**
 
 Before interpolation, SOC is clipped to the validated support:
 
-$$
-z_{\mathrm{OCV}}
-=
-\mathrm{clip}
-\bigl(
-z,
-z_{\min}^{(c)},
-z_{\max}^{(c)}
-\bigr).
-$$
+$$z_{\mathrm{OCV}}=\mathrm{clip}(z,z_{\min}^{(c)},z_{\max}^{(c)}).$$
 
 **(10)**
 
 The inverse OCV calculation is also linear interpolation:
 
-$$
-z_{\mathrm{inv}}^{(c)}(V)
-=
-\mathrm{interp}
-\bigl(
-V;
-U_{\mathrm{inv}}^{(c)},
-z_{\mathrm{inv}}^{(c)}
-\bigr).
-$$
+$$z_{\mathrm{inv}}^{(c)}(V)=\mathrm{interp}(V;U_{\mathrm{inv}}^{(c)},z_{\mathrm{inv}}^{(c)}).$$
 
 **(11)**
 
@@ -823,13 +759,7 @@ The code uses a hierarchy of initial-SOC evidence.
 
 When a finite published initial SOC exists and satisfies
 
-$$
--0.02
-\le
-z_{s,0}^{\mathrm{published}}
-\le
-1.02,
-$$
+$$-0.02\le z_{s,0}^{\mathrm{published}}\le1.02,$$
 
 **(12)**
 
@@ -839,19 +769,13 @@ it is used as a directly reliable point anchor.
 
 The initial window contains the first
 
-$$
-N_{\mathrm{rest}}=5
-$$
+$$N_{\mathrm{rest}}=5$$
 
 samples.
 
 A sample is considered at rest when
 
-$$
-|I_{s,k}|
-\le
-0.05\ \mathrm{A}.
-$$
+$$|I_{s,k}|\le0.05\ \mathrm{A}.$$
 
 **(13)**
 
@@ -859,16 +783,7 @@ An initial-rest condition is detected only when all five required initial sample
 
 The initial-rest voltage is then
 
-$$
-V_{s,0}^{\mathrm{rest}}
-=
-\mathrm{median}
-\bigl(
-V_{s,0},
-\ldots,
-V_{s,4}
-\bigr).
-$$
+$$V_{s,0}^{\mathrm{rest}}=\mathrm{median}(V_{s,0},\ldots,V_{s,4}).$$
 
 **(14)**
 
@@ -884,25 +799,13 @@ Let $V^\star$ be the nearest OCV-grid voltage to the clipped initial voltage.
 
 Define
 
-$$
-P_s
-=
-\{j:U_j^{(c)}-V^\star\le\varepsilon_{\mathrm{OCV}}\}.
-$$
+$$P_s=\{j:U_j^{(c)}-V^\star\le\varepsilon_{\mathrm{OCV}}\}.$$
 
 **(15)**
 
 The implemented tolerance is
 
-$$
-\varepsilon_{\mathrm{OCV}}
-=
-\max
-\bigl(
-10^{-8},
-10\varepsilon_{\mathrm{mon}}
-\bigr).
-$$
+$$\varepsilon_{\mathrm{OCV}}=\max(10^{-8},10\varepsilon_{\mathrm{mon}}).$$
 
 **(16)**
 
@@ -910,14 +813,7 @@ The default monotonicity tolerance is $10^{-9}\ \mathrm{V}$.
 
 If at least two grid points satisfy Equation (15), the equivalent initial-SOC interval is
 
-$$
-Z_s^{\mathrm{OCV}}
-=
-\bigl[
-\min_{j\in P_s}z_j^{(c)},
-\max_{j\in P_s}z_j^{(c)}
-\bigr].
-$$
+$$Z_s^{\mathrm{OCV}}=[\min_{j\in P_s}z_j^{(c)},\max_{j\in P_s}z_j^{(c)}].$$
 
 **(17)**
 
@@ -929,11 +825,7 @@ Otherwise, the interval collapses to the representative inverse-OCV value.
 
 When the first five samples do not satisfy the rest condition, the first terminal voltage is inverted provisionally:
 
-$$
-z_{s,0}^{\mathrm{provisional}}
-=
-z_{\mathrm{inv}}^{(c)}(V_{s,0}).
-$$
+$$z_{s,0}^{\mathrm{provisional}}=z_{\mathrm{inv}}^{(c)}(V_{s,0}).$$
 
 **(18)**
 
@@ -945,34 +837,19 @@ The code explicitly marks this anchor as not directly reliable. Such a trajector
 
 The code uses a coulombic efficiency of
 
-$$
-\eta=1.
-$$
+$$\eta=1.$$
 
 **(19)**
 
 For interval $k$, signed charge throughput in ampere-hours is
 
-$$
-\Delta q_{s,k}^{\mathrm{signed}}
-=
-\frac{
-\Delta t_{s,k}
-\bigl(
-I_{s,k}+I_{s,k+1}
-\bigr)
-}{
-7200
-}.
-$$
+$$\Delta q_{s,k}^{\mathrm{signed}}=\frac{\Delta t_{s,k}(I_{s,k}+I_{s,k+1})}{7200}.$$
 
 **(20)**
 
 The denominator is
 
-$$
-7200=2\times3600
-$$
+$$7200=2\times3600$$
 
 because the implementation combines:
 
@@ -981,85 +858,37 @@ because the implementation combines:
 
 The absolute-throughput increment is
 
-$$
-\Delta q_{s,k}^{\mathrm{abs}}
-=
-\frac{
-\Delta t_{s,k}
-\bigl(
-|I_{s,k}|+|I_{s,k+1}|
-\bigr)
-}{
-7200
-}.
-$$
+$$\Delta q_{s,k}^{\mathrm{abs}}=\frac{\Delta t_{s,k}(|I_{s,k}|+|I_{s,k+1}|)}{7200}.$$
 
 **(21)**
 
 Cumulative signed charge is
 
-$$
-q_{s,k}^{\mathrm{signed}}
-=
-\sum_{\ell=0}^{k-1}
-\Delta q_{s,\ell}^{\mathrm{signed}},
-\qquad
-q_{s,0}^{\mathrm{signed}}=0.
-$$
+$$q_{s,k}^{\mathrm{signed}}=\sum_{\ell=0}^{k-1}\Delta q_{s,\ell}^{\mathrm{signed}},\qquad q_{s,0}^{\mathrm{signed}}=0.$$
 
 **(22)**
 
 For a positive trajectory capacity $Q_s$, the cumulative SOC drop is
 
-$$
-d_{s,k}
-=
-\frac{
-\eta q_{s,k}^{\mathrm{signed}}
-}{
-Q_s
-}.
-$$
+$$d_{s,k}=\frac{\eta q_{s,k}^{\mathrm{signed}}}{Q_s}.$$
 
 **(23)**
 
 Raw reconstructed SOC is
 
-$$
-z_{s,k}^{\mathrm{raw}}
-=
-z_{s,0}-d_{s,k}.
-$$
+$$z_{s,k}^{\mathrm{raw}}=z_{s,0}-d_{s,k}.$$
 
 **(24)**
 
 The code also produces a bounded display variable:
 
-$$
-z_{s,k}^{\mathrm{bounded}}
-=
-\mathrm{clip}
-\bigl(
-z_{s,k}^{\mathrm{raw}},
-0,
-1
-\bigr).
-$$
+$$z_{s,k}^{\mathrm{bounded}}=\mathrm{clip}(z_{s,k}^{\mathrm{raw}},0,1).$$
 
 **(25)**
 
 However, the OCV input is not necessarily Equation (25). It is instead clipped to the chemistry-specific OCV support:
 
-$$
-z_{s,k}^{\mathrm{OCV}}
-=
-\mathrm{clip}
-\bigl(
-z_{s,k}^{\mathrm{raw}},
-z_{\min}^{(c)},
-z_{\max}^{(c)}
-\bigr).
-$$
+$$z_{s,k}^{\mathrm{OCV}}=\mathrm{clip}(z_{s,k}^{\mathrm{raw}},z_{\min}^{(c)},z_{\max}^{(c)}).$$
 
 **(26)**
 
@@ -1069,97 +898,47 @@ $$
 
 Because
 
-$$
-z_{s,k}^{\mathrm{raw}}
-=
-z_{s,0}-d_{s,k},
-$$
+$$z_{s,k}^{\mathrm{raw}}=z_{s,0}-d_{s,k},$$
 
 the requirement that all reconstructed SOC values remain inside the chemistry-specific OCV support is
 
-$$
-z_{\min}^{(c)}
-\le
-z_{s,0}-d_{s,k}
-\le
-z_{\max}^{(c)}.
-$$
+$$z_{\min}^{(c)}\le z_{s,0}-d_{s,k}\le z_{\max}^{(c)}.$$
 
 **(27)**
 
 Therefore, the initial SOC must satisfy
 
-$$
-z_{s,0}
-\ge
-z_{\min}^{(c)}
-+
-\max_k d_{s,k},
-$$
+$$z_{s,0}\ge z_{\min}^{(c)}+\max_k d_{s,k},$$
 
 **(28)**
 
 and
 
-$$
-z_{s,0}
-\le
-z_{\max}^{(c)}
-+
-\min_k d_{s,k}.
-$$
+$$z_{s,0}\le z_{\max}^{(c)}+\min_k d_{s,k}.$$
 
 **(29)**
 
 The current-profile-feasible interval is therefore
 
-$$
-Z_s^F
-=
-\bigl[
-z_{\min}^{(c)}+\max_k d_{s,k},
-z_{\max}^{(c)}+\min_k d_{s,k}
-\bigr].
-$$
+$$Z_s^F=[z_{\min}^{(c)}+\max_k d_{s,k},z_{\max}^{(c)}+\min_k d_{s,k}].$$
 
 **(30)**
 
 A feasible interval exists when
 
-$$
-\underline{z}_s^F
-\le
-\overline{z}_s^F
-+
-10^{-10}.
-$$
+$$\underline{z}_s^F\le\overline{z}_s^F+10^{-10}.$$
 
 **(31)**
 
 The code intersects the OCV-supported initial interval and the charge-balance interval:
 
-$$
-Z_s^I
-=
-Z_s^{\mathrm{OCV}}
-\cap
-Z_s^F.
-$$
+$$Z_s^I=Z_s^{\mathrm{OCV}}\cap Z_s^F.$$
 
 **(32)**
 
 If the anchor is directly reliable and the intersection is nonempty, the selected initial SOC is
 
-$$
-z_{s,0}
-=
-\mathrm{clip}
-\bigl(
-z_{s,0}^{\mathrm{rep}},
-\underline{z}_s^I,
-\overline{z}_s^I
-\bigr).
-$$
+$$z_{s,0}=\mathrm{clip}(z_{s,0}^{\mathrm{rep}},\underline{z}_s^I,\overline{z}_s^I).$$
 
 **(33)**
 
@@ -1183,19 +962,7 @@ The code does not fit every eligible training trajectory. It constructs a repres
 
 For trajectory $s$, the excitation score is
 
-$$
-E_s
-=
-\log(1+Q_{s,\mathrm{abs}})
-+
-\log(1+\sigma_{I,s})
-+
-3\Delta z_s
-+
-0.05\Delta T_s
-+
-0.10\log(1+D_s).
-$$
+$$E_s=\log(1+Q_{s,\mathrm{abs}})+\log(1+\sigma_{I,s})+3\Delta z_s+0.05\Delta T_s+0.10\log(1+D_s).$$
 
 **(34)**
 
@@ -1214,19 +981,7 @@ For each chemistry, the code selects at most:
 
 Approximately 70% of each selection is taken from the highest excitation scores:
 
-$$
-n_{\mathrm{high}}
-=
-\min
-\bigl[
-n_{\mathrm{target}},
-\max
-\bigl(
-1,
-\mathrm{round}(0.70n_{\mathrm{target}})
-\bigr)
-\bigr].
-$$
+$$n_{\mathrm{high}}=\min[n_{\mathrm{target}},\max(1,\mathrm{round}(0.70n_{\mathrm{target}}))].$$
 
 **(35)**
 
@@ -1234,15 +989,11 @@ The remaining 30% is selected across five excitation-percentile strata to retain
 
 The executed selection gives, for each chemistry:
 
-$$
-175+75=250
-$$
+$$175+75=250$$
 
 training trajectories and
 
-$$
-70+30=100
-$$
+$$70+30=100$$
 
 calibration trajectories.
 
@@ -1254,37 +1005,19 @@ For a trajectory with $N_s$ samples, sample zero is excluded from fitting becaus
 
 The available residual count is
 
-$$
-N_s-1.
-$$
+$$N_s-1.$$
 
 **(36)**
 
 The number retained for fitting is
 
-$$
-M_s
-=
-\min(N_s-1,700).
-$$
+$$M_s=\min(N_s-1,700).$$
 
 **(37)**
 
 The code creates approximately evenly spaced integer indices:
 
-$$
-K_s
-=
-\mathrm{unique}
-\bigl[
-\mathrm{linspace}
-\bigl(
-1,
-N_s-1,
-M_s
-\bigr)
-\bigr].
-$$
+$$K_s=\mathrm{unique}[\mathrm{linspace}(1,N_s-1,M_s)].$$
 
 **(38)**
 
@@ -1296,58 +1029,33 @@ Thus, the optimization does not simply use the first 700 observations. It distri
 
 A trajectory with
 
-$$
-m_s=|K_s|
-$$
+$$m_s=|K_s|$$
 
 fitting residuals receives a trajectory weight
 
-$$
-w_s^{\mathrm{traj}}
-=
-\frac{1}{m_s}.
-$$
+$$w_s^{\mathrm{traj}}=\frac{1}{m_s}.$$
 
 **(39)**
 
 If chemistry $c$ contributes $n_c$ selected trajectories, it receives chemistry weight
 
-$$
-w_c^{\mathrm{chem}}
-=
-\frac{1}{n_c}.
-$$
+$$w_c^{\mathrm{chem}}=\frac{1}{n_c}.$$
 
 **(40)**
 
 The preliminary weight assigned to every selected residual of trajectory $s$ is
 
-$$
-w_{s,k}
-=
-w_s^{\mathrm{traj}}
-w_{c(s)}^{\mathrm{chem}}.
-$$
+$$w_{s,k}=w_s^{\mathrm{traj}}w_{c(s)}^{\mathrm{chem}}.$$
 
 **(41)**
 
 Let $M$ be the total number of selected fitting residuals. Define the mean preliminary weight as
 
-$$
-\bar{w}
-=
-\frac{1}{M}
-\sum_{j=1}^{M}
-w_j.
-$$
+$$\bar{w}=\frac{1}{M}\sum_{j=1}^{M}w_j.$$
 
 The normalized residual weight is
 
-$$
-w_{s,k}
-\leftarrow
-\frac{w_{s,k}}{\bar{w}}.
-$$
+$$w_{s,k}\leftarrow\frac{w_{s,k}}{\bar{w}}.$$
 
 **(42)**
 
@@ -1362,77 +1070,35 @@ This implementation reduces domination by:
 
 The code implements the terminal-voltage equation
 
-$$
-V_{s,k}
-=
-U_{s,k}
--
-R_0I_{s,k}
--
-v_{1,s,k}.
-$$
+$$V_{s,k}=U_{s,k}-R_0I_{s,k}-v_{1,s,k}.$$
 
 **(43)**
 
 where
 
-$$
-U_{s,k}
-=
-U_{\mathrm{oc}}^{(c(s))}
-\bigl(
-z_{s,k}^{\mathrm{OCV}}
-\bigr).
-$$
+$$U_{s,k}=U_{\mathrm{oc}}^{(c(s))}(z_{s,k}^{\mathrm{OCV}}).$$
 
 For interval $k$, define
 
-$$
-a_{1,s,k}
-=
-\exp
-\biggl(
--\frac{\Delta t_{s,k}}{\tau_1}
-\biggr).
-$$
+$$a_{1,s,k}=\exp\left(-\frac{\Delta t_{s,k}}{\tau_1}\right).$$
 
 **(44)**
 
 The exact recursive update in the code is
 
-$$
-v_{1,s,k+1}
-=
-a_{1,s,k}v_{1,s,k}
-+
-R_1
-\bigl(
-1-a_{1,s,k}
-\bigr)
-I_{s,k}.
-$$
+$$v_{1,s,k+1}=a_{1,s,k}v_{1,s,k}+R_1(1-a_{1,s,k})I_{s,k}.$$
 
 **(45)**
 
 After propagating Equation (45), the next voltage is evaluated using the next-sample current:
 
-$$
-V_{s,k+1}
-=
-U_{s,k+1}
--
-R_0I_{s,k+1}
--
-v_{1,s,k+1}.
-$$
+$$V_{s,k+1}=U_{s,k+1}-R_0I_{s,k+1}-v_{1,s,k+1}.$$
 
 **(46)**
 
 The parameters
 
-$$
-R_0,\ R_1,\ \tau_1
-$$
+$$R_0,\ R_1,\ \tau_1$$
 
 are constant over every sample in the assigned scope.
 
@@ -1442,99 +1108,43 @@ are constant over every sample in the assigned scope.
 
 The two-RC terminal-voltage equation is
 
-$$
-V_{s,k}
-=
-U_{s,k}
--
-R_0I_{s,k}
--
-v_{1,s,k}
--
-v_{2,s,k}.
-$$
+$$V_{s,k}=U_{s,k}-R_0I_{s,k}-v_{1,s,k}-v_{2,s,k}.$$
 
 **(47)**
 
 Define
 
-$$
-a_{1,s,k}
-=
-\exp
-\biggl(
--\frac{\Delta t_{s,k}}{\tau_1}
-\biggr),
-$$
+$$a_{1,s,k}=\exp\left(-\frac{\Delta t_{s,k}}{\tau_1}\right),$$
 
 **(48)**
 
 and
 
-$$
-a_{2,s,k}
-=
-\exp
-\biggl(
--\frac{\Delta t_{s,k}}{\tau_2}
-\biggr).
-$$
+$$a_{2,s,k}=\exp\left(-\frac{\Delta t_{s,k}}{\tau_2}\right).$$
 
 **(49)**
 
 The implemented recursions are
 
-$$
-v_{1,s,k+1}
-=
-a_{1,s,k}v_{1,s,k}
-+
-R_1
-\bigl(
-1-a_{1,s,k}
-\bigr)
-I_{s,k},
-$$
+$$v_{1,s,k+1}=a_{1,s,k}v_{1,s,k}+R_1(1-a_{1,s,k})I_{s,k},$$
 
 **(50)**
 
 and
 
-$$
-v_{2,s,k+1}
-=
-a_{2,s,k}v_{2,s,k}
-+
-R_2
-\bigl(
-1-a_{2,s,k}
-\bigr)
-I_{s,k}.
-$$
+$$v_{2,s,k+1}=a_{2,s,k}v_{2,s,k}+R_2(1-a_{2,s,k})I_{s,k}.$$
 
 **(51)**
 
 The next-sample prediction is
 
-$$
-V_{s,k+1}
-=
-U_{s,k+1}
--
-R_0I_{s,k+1}
--
-v_{1,s,k+1}
--
-v_{2,s,k+1}.
-$$
+$$V_{s,k+1}=U_{s,k+1}-R_0I_{s,k+1}-v_{1,s,k+1}-v_{2,s,k+1}.$$
 
 **(52)**
 
 No SOC, current, temperature, elapsed-time, or trajectory dependence is introduced into
 
-$$
-R_0,\ R_1,\ R_2,\ \tau_1,\ \tau_2.
-$$
+$$R_0,\ R_1,\ R_2,\ \tau_1,\ \tau_2.$$
 
 They remain fixed within the scope.
 
@@ -1550,23 +1160,13 @@ It does not reset the state at later samples.
 
 The code defines
 
-$$
-v_{1,s,0}
-=
-U_{s,0}
--
-R_0I_{s,0}
--
-V_{s,0}.
-$$
+$$v_{1,s,0}=U_{s,0}-R_0I_{s,0}-V_{s,0}.$$
 
 **(53)**
 
 Substitution into Equation (43) gives
 
-$$
-V_{s,0}=V_{s,0}.
-$$
+$$V_{s,0}=V_{s,0}.$$
 
 **(54)**
 
@@ -1576,53 +1176,29 @@ Thus, the initial prediction residual is forced to zero up to floating-point pre
 
 First define total initial polarization:
 
-$$
-v_{\Sigma,s,0}
-=
-U_{s,0}
--
-R_0I_{s,0}
--
-V_{s,0}.
-$$
+$$v_{\Sigma,s,0}=U_{s,0}-R_0I_{s,0}-V_{s,0}.$$
 
 **(55)**
 
 The code divides this value according to the branch resistances:
 
-$$
-v_{1,s,0}
-=
-\frac{R_1}{R_1+R_2}
-v_{\Sigma,s,0},
-$$
+$$v_{1,s,0}=\frac{R_1}{R_1+R_2}v_{\Sigma,s,0},$$
 
 **(56)**
 
 and
 
-$$
-v_{2,s,0}
-=
-\frac{R_2}{R_1+R_2}
-v_{\Sigma,s,0}.
-$$
+$$v_{2,s,0}=\frac{R_2}{R_1+R_2}v_{\Sigma,s,0}.$$
 
 **(57)**
 
 Therefore,
 
-$$
-v_{1,s,0}+v_{2,s,0}
-=
-v_{\Sigma,s,0},
-$$
+$$v_{1,s,0}+v_{2,s,0}=v_{\Sigma,s,0},$$
 
 and
 
-$$
-V_{s,0}=V_{s,0}.
-$$
+$$V_{s,0}=V_{s,0}.$$
 
 **(58)**
 
@@ -1630,9 +1206,7 @@ The first sample is excluded from fitting and formal free-run evaluation.
 
 The evaluation set for trajectory $s$ is therefore
 
-$$
-E_s=\{1,\ldots,N_s-1\}.
-$$
+$$E_s=\{1,\ldots,N_s-1\}.$$
 
 **(59)**
 
@@ -1646,37 +1220,19 @@ The optimizer operates in logarithmic coordinates.
 
 The transformed vector is
 
-$$
-\xi_1
-=
-\bigl(
-\log R_0,
-\log R_1,
-\log \tau_1
-\bigr)^T.
-$$
+$$\xi_1=(\log R_0,\log R_1,\log\tau_1)^T.$$
 
 **(60)**
 
 The decoded parameters are
 
-$$
-R_0=e^{\xi_1},
-\qquad
-R_1=e^{\xi_2},
-\qquad
-\tau_1=e^{\xi_3}.
-$$
+$$R_0=e^{\xi_1},\qquad R_1=e^{\xi_2},\qquad\tau_1=e^{\xi_3}.$$
 
 **(61)**
 
 The derived capacitance is
 
-$$
-C_1
-=
-\frac{\tau_1}{R_1}.
-$$
+$$C_1=\frac{\tau_1}{R_1}.$$
 
 **(62)**
 
@@ -1684,85 +1240,49 @@ $$
 
 The transformed vector is
 
-$$
-\xi_2
-=
-\bigl(
-\log R_0,
-\log R_1,
-\log R_2,
-\log \tau_1,
-\log \tau_{\mathrm{gap}}
-\bigr)^T.
-$$
+$$\xi_2=(\log R_0,\log R_1,\log R_2,\log\tau_1,\log\tau_{\mathrm{gap}})^T.$$
 
 **(63)**
 
 The physical parameters are
 
-$$
-R_0=e^{\xi_1},
-\qquad
-R_1=e^{\xi_2},
-\qquad
-R_2=e^{\xi_3},
-$$
+$$R_0=e^{\xi_1},\qquad R_1=e^{\xi_2},\qquad R_2=e^{\xi_3},$$
 
 **(64)**
 
-$$
-\tau_1=e^{\xi_4},
-$$
+$$\tau_1=e^{\xi_4},$$
 
 **(65)**
 
-$$
-\tau_{\mathrm{gap}}=e^{\xi_5},
-$$
+$$\tau_{\mathrm{gap}}=e^{\xi_5},$$
 
 **(66)**
 
 and
 
-$$
-\tau_2
-=
-\tau_1+\tau_{\mathrm{gap}}.
-$$
+$$\tau_2=\tau_1+\tau_{\mathrm{gap}}.$$
 
 **(67)**
 
 The capacitances are
 
-$$
-C_1
-=
-\frac{\tau_1}{R_1},
-$$
+$$C_1=\frac{\tau_1}{R_1},$$
 
 **(68)**
 
 and
 
-$$
-C_2
-=
-\frac{\tau_2}{R_2}.
-$$
+$$C_2=\frac{\tau_2}{R_2}.$$
 
 **(69)**
 
 Because
 
-$$
-\tau_{\mathrm{gap}}>0,
-$$
+$$\tau_{\mathrm{gap}}>0,$$
 
 the code guarantees
 
-$$
-\tau_2>\tau_1.
-$$
+$$\tau_2>\tau_1.$$
 
 **(70)**
 
@@ -1772,36 +1292,19 @@ $$
 
 The code estimates fixed models for
 
-$$
-q
-\in
-\{
-\mathrm{GLOBAL},
-\mathrm{LFP},
-\mathrm{NCA},
-\mathrm{NMC}
-\}.
-$$
+$$q\in\{\mathrm{GLOBAL},\mathrm{LFP},\mathrm{NCA},\mathrm{NMC}\}.$$
 
 **(75)**
 
 For the global candidate,
 
-$$
-\xi_s
-=
-\xi_{\mathrm{GLOBAL}}
-$$
+$$\xi_s=\xi_{\mathrm{GLOBAL}}$$
 
 for all chemistries.
 
 For a chemistry-specific candidate,
 
-$$
-\xi_s
-=
-\xi_{c(s)}.
-$$
+$$\xi_s=\xi_{c(s)}.$$
 
 **(76)**
 
@@ -1824,13 +1327,7 @@ The eight fitted candidate families are:
 
 The signed residual is
 
-$$
-e_{s,k}
-=
-V_{s,k}
--
-\widehat{V}_{s,k}.
-$$
+$$e_{s,k}=V_{s,k}-\widehat{V}_{s,k}.$$
 
 **(78)**
 
@@ -1841,68 +1338,33 @@ Thus:
 
 The weighted fitting residual is
 
-$$
-r_{s,k}
-=
-w_{s,k}e_{s,k}.
-$$
+$$r_{s,k}=w_{s,k}e_{s,k}.$$
 
 **(79)**
 
 The code uses a Huber scale of
 
-$$
-\delta=0.020\ \mathrm{V}.
-$$
+$$\delta=0.020\ \mathrm{V}.$$
 
 **(80)**
 
 For $|r|\le\delta$, the implemented Huber loss is
 
-$$
-\ell_\delta(r)
-=
-\frac{1}{2}r^2.
-$$
+$$\ell_\delta(r)=\frac{1}{2}r^2.$$
 
 For $|r|>\delta$, the implemented Huber loss is
 
-$$
-\ell_\delta(r)
-=
-\delta|r|
--
-\frac{1}{2}\delta^2.
-$$
+$$\ell_\delta(r)=\delta|r|-\frac{1}{2}\delta^2.$$
 
 **(81)**
 
 For scope $q$ and model order $m$, define
 
-$$
-J_{q,m}(\xi)
-=
-\sum_{s\in S_{\mathrm{train},q}}
-\sum_{k\in K_s}
-\ell_{0.020}
-\bigl(
-w_{s,k}
-[
-V_{s,k}
--
-\widehat{V}_{s,k}(\xi)
-]
-\bigr).
-$$
+$$J_{q,m}(\xi)=\sum_{s\in S_{\mathrm{train},q}}\sum_{k\in K_s}\ell_{0.020}(w_{s,k}[V_{s,k}-\widehat{V}_{s,k}(\xi)]).$$
 
 The estimated parameter vector is the bounded value of $\xi$ that minimizes $J_{q,m}(\xi)$:
 
-$$
-\widehat{\xi}_{q,m}
-=
-\arg\min_{\underline{\xi}_m\le\xi\le\overline{\xi}_m}
-J_{q,m}(\xi).
-$$
+$$\widehat{\xi}_{q,m}=\mathrm{argmin}_{\underline{\xi}_m\le\xi\le\overline{\xi}_m}J_{q,m}(\xi).$$
 
 **(82)**
 
@@ -1942,39 +1404,21 @@ The `optimizer_success` flag is stored, but a solution can still be considered a
 
 For the one-RC model, the nominal initial point is
 
-$$
-R_0=0.015\ \Omega,
-\qquad
-R_1=0.010\ \Omega,
-\qquad
-\tau_1=20\ \mathrm{s}.
-$$
+$$R_0=0.015\ \Omega,\qquad R_1=0.010\ \Omega,\qquad\tau_1=20\ \mathrm{s}.$$
 
 **(83)**
 
 For the two-RC model, the nominal point is
 
-$$
-R_0=0.015\ \Omega,
-\qquad
-R_1=0.008\ \Omega,
-\qquad
-R_2=0.015\ \Omega,
-$$
+$$R_0=0.015\ \Omega,\qquad R_1=0.008\ \Omega,\qquad R_2=0.015\ \Omega,$$
 
-$$
-\tau_1=5\ \mathrm{s},
-\qquad
-\tau_2=105\ \mathrm{s}.
-$$
+$$\tau_1=5\ \mathrm{s},\qquad\tau_2=105\ \mathrm{s}.$$
 
 **(84)**
 
 This implies an initial gap of
 
-$$
-\tau_{\mathrm{gap}}=100\ \mathrm{s}.
-$$
+$$\tau_{\mathrm{gap}}=100\ \mathrm{s}.$$
 
 The remaining starts are sampled uniformly in transformed log-parameter space between the transformed bounds.
 
@@ -2001,27 +1445,13 @@ Within each scope and model order, valid starts are sorted in the following exac
 
 For trajectory $s$, free-run RMSE is
 
-$$
-\mathrm{RMSE}_s
-=
-\sqrt{
-\frac{1}{N_s-1}
-\sum_{k=1}^{N_s-1}
-e_{s,k}^2
-}.
-$$
+$$\mathrm{RMSE}_s=\sqrt{\frac{1}{N_s-1}\sum_{k=1}^{N_s-1}e_{s,k}^2}.$$
 
 **(86)**
 
 The trajectory-weighted RMSE is
 
-$$
-\mathrm{RMSE}_{\mathrm{traj}}
-=
-\frac{1}{S}
-\sum_{s=1}^{S}
-\mathrm{RMSE}_s.
-$$
+$$\mathrm{RMSE}_{\mathrm{traj}}=\frac{1}{S}\sum_{s=1}^{S}\mathrm{RMSE}_s.$$
 
 **(87)**
 
@@ -2033,55 +1463,31 @@ Every trajectory receives equal weight in Equation (87), regardless of its sampl
 
 For reference model $A$ and candidate model $B$, relative calibration improvement is
 
-$$
-I_{A\rightarrow B}
-=
-\frac{
-\mathrm{RMSE}_A^{\mathrm{traj}}
--
-\mathrm{RMSE}_B^{\mathrm{traj}}
-}{
-\mathrm{RMSE}_A^{\mathrm{traj}}
-}.
-$$
+$$I_{A\rightarrow B}=\frac{\mathrm{RMSE}_A^{\mathrm{traj}}-\mathrm{RMSE}_B^{\mathrm{traj}}}{\mathrm{RMSE}_A^{\mathrm{traj}}}.$$
 
 **(88)**
 
 The code uses a minimum improvement of
 
-$$
-0.01.
-$$
+$$0.01.$$
 
 **(89)**
 
 A global two-RC model replaces the global one-RC model only if
 
-$$
-I_{\mathrm{global\ 1RC}\rightarrow\mathrm{global\ 2RC}}
-\ge
-0.01.
-$$
+$$I_{\mathrm{global\ 1RC}\rightarrow\mathrm{global\ 2RC}}\ge0.01.$$
 
 **(90)**
 
 A chemistry-specific two-RC model replaces the chemistry-specific one-RC model only if
 
-$$
-I_{\mathrm{specific\ 1RC}\rightarrow\mathrm{specific\ 2RC}}
-\ge
-0.01.
-$$
+$$I_{\mathrm{specific\ 1RC}\rightarrow\mathrm{specific\ 2RC}}\ge0.01.$$
 
 **(91)**
 
 The selected chemistry-specific model replaces the selected global model only if
 
-$$
-I_{\mathrm{selected\ global}\rightarrow\mathrm{selected\ chemistry}}
-\ge
-0.01.
-$$
+$$I_{\mathrm{selected\ global}\rightarrow\mathrm{selected\ chemistry}}\ge0.01.$$
 
 **(92)**
 
@@ -2089,11 +1495,7 @@ This produces an automatic parsimonious candidate for each chemistry.
 
 Separately, the code preserves the chemistry-specific two-RC model as the primary fixed baseline:
 
-$$
-M_{\mathrm{primary}}^{(c)}
-=
-M_{\mathrm{specific,2RC}}^{(c)}.
-$$
+$$M_{\mathrm{primary}}^{(c)}=M_{\mathrm{specific,2RC}}^{(c)}.$$
 
 **(93)**
 
@@ -2133,39 +1535,19 @@ Let $N$ be the number of evaluated samples in a group.
 
 ### 26.1 Bias
 
-$$
-\mathrm{Bias}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-e_i.
-$$
+$$\mathrm{Bias}=\frac{1}{N}\sum_{i=1}^{N}e_i.$$
 
 **(94)**
 
 ### 26.2 Root-Mean-Square Error
 
-$$
-\mathrm{RMSE}
-=
-\sqrt{
-\frac{1}{N}
-\sum_{i=1}^{N}
-e_i^2
-}.
-$$
+$$\mathrm{RMSE}=\sqrt{\frac{1}{N}\sum_{i=1}^{N}e_i^2}.$$
 
 **(95)**
 
 ### 26.3 Mean Absolute Error
 
-$$
-\mathrm{MAE}
-=
-\frac{1}{N}
-\sum_{i=1}^{N}
-|e_i|.
-$$
+$$\mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}|e_i|.$$
 
 **(96)**
 
@@ -2173,15 +1555,7 @@ $$
 
 The code uses the population standard deviation:
 
-$$
-\sigma_e
-=
-\sqrt{
-\frac{1}{N}
-\sum_{i=1}^{N}
-(e_i-\bar{e})^2
-}.
-$$
+$$\sigma_e=\sqrt{\frac{1}{N}\sum_{i=1}^{N}(e_i-\bar{e})^2}.$$
 
 **(97)**
 
@@ -2189,37 +1563,21 @@ $$
 
 The code calculates:
 
-$$
-\mathrm{MedAE}
-=
-\mathrm{median}(|e_i|),
-$$
+$$\mathrm{MedAE}=\mathrm{median}(|e_i|),$$
 
 **(98)**
 
-$$
-P_{95}
-=
-q_{0.95}(|e_i|),
-$$
+$$P_{95}=q_{0.95}(|e_i|),$$
 
 **(99)**
 
-$$
-P_{99}
-=
-q_{0.99}(|e_i|),
-$$
+$$P_{99}=q_{0.99}(|e_i|),$$
 
 **(100)**
 
 and
 
-$$
-E_{\max}
-=
-\max_i |e_i|.
-$$
+$$E_{\max}=\max_i|e_i|.$$
 
 **(101)**
 
@@ -2227,19 +1585,11 @@ $$
 
 Let
 
-$$
-\Delta V
-=
-V_{\max}-V_{\min}.
-$$
+$$\Delta V=V_{\max}-V_{\min}.$$
 
 The implemented normalized RMSE is
 
-$$
-\mathrm{NRMSE}
-=
-\frac{\mathrm{RMSE}}{\Delta V}.
-$$
+$$\mathrm{NRMSE}=\frac{\mathrm{RMSE}}{\Delta V}.$$
 
 **(102)**
 
@@ -2251,25 +1601,13 @@ The code does not compute $R^2$ in the fixed-ECM metric function.
 
 Let
 
-$$
-\widetilde{e}_i
-=
-e_i-\bar{e}.
-$$
+$$\widetilde{e}_i=e_i-\bar{e}.$$
 
 The implemented lag-one statistic is
 
-$$
-\rho_1
-=
-\frac{
-\sum_{i=1}^{N-1}
-\widetilde{e}_{i-1}
-\widetilde{e}_i
-}{
-\sum_{i=0}^{N-1}
-\widetilde{e}_i^2
-}.
-$$
+$$\rho_1=\frac{\sum_{i=1}^{N-1}\widetilde{e}_{i-1}\widetilde{e}_i}{\sum_{i=0}^{N-1}\widetilde{e}_i^2}.$$
 
 **(103)**
+
+
+
