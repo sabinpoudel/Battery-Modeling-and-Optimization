@@ -2283,7 +2283,7 @@ $$\mathrm{RSS}_{\mathrm{exact}}(m)=r_{\mathrm{exact}}(m)^T r_{\mathrm{exact}}(m)
 
 The exact Huber objective is
 
-$$H_{\mathrm{exact}}(m)=\sum_i \ell_{0.020}\bigl(r_{\mathrm{exact},i}(m)\bigr).$$
+$$H_{\mathrm{exact}}(m)=\sum_i \ell_{0.020}\bigl(r_{\mathrm{exact},i}(m)\bigr)$$
 
 **(149)**
 
