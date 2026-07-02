@@ -505,3 +505,36 @@ NCA provides the broadest two-dimensional excitation coverage, while LFP and NMC
 
 
 
+ Notebook 11
+
+## Introduction
+
+Notebook 11 constructs and audits fixed-parameter equivalent-circuit battery models using experimentally measured current, terminal voltage, temperature, elapsed time, chemistry identity, cell identity, and trajectory identity.
+
+The implementation begins with an exact trajectory audit and chemistry-specific open-circuit-voltage preparation. It then reconstructs SOC using capacity and trapezoidal coulomb counting. Only trajectories with a directly reliable and charge-balance-consistent initial SOC are admitted to model fitting.
+
+Two equivalent-circuit structures are estimated:
+
+- a fixed one-RC model;
+- a fixed two-RC model.
+
+Each structure is estimated at four parameter scopes:
+
+- one global parameter vector shared by LFP, NCA, and NMC;
+- one LFP-specific parameter vector;
+- one NCA-specific parameter vector;
+- one NMC-specific parameter vector.
+
+The models are fitted only on training trajectories. Calibration trajectories determine the best optimizer start and the automatic model-complexity decision. Ordinary-test and strict-test trajectories remain excluded until parameters have been frozen.
+
+The code then performs:
+
+- full recursive free-run prediction;
+- pooled and trajectory-level error analysis;
+- residual dependence analysis;
+- numerical practical-identifiability analysis;
+- exact objective slicing;
+- trajectory-block bootstrap analysis;
+- final acceptance or rejection.
+
+
