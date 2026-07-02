@@ -595,17 +595,9 @@ Classify each frozen model as:
 
 ## Data Hierarchy and Notation
 
-Let
+Let $s=1,\ldots,S$ index trajectories or experimental segments.
 
-$$s=1,\ldots,S$$
-
-index trajectories or experimental segments.
-
-Within trajectory $s$, let
-
-$$k=0,\ldots,N_s-1$$
-
-index samples.
+Within trajectory $s$, let $k=0,\ldots,N_s-1$ index samples.
 
 The code uses:
 
@@ -615,23 +607,15 @@ The code uses:
 - $T_{s,k}$ for cell temperature;
 - $z_{s,k}$ for reconstructed SOC.
 
-The sampling interval is
+**Equation (1):** $\Delta t_{s,k}=t_{s,k+1}-t_{s,k},\qquad k=0,\ldots,N_s-2.$
 
-$$\Delta t_{s,k}=t_{s,k+1}-t_{s,k},\qquad k=0,\ldots,N_s-2.$$
+The code requires:
 
-**(1)**
+**Equation (2):** $\Delta t_{s,k}>0.$
 
-The code requires
+The current convention is explicitly fixed as:
 
-$$\Delta t_{s,k}>0.$$
-
-**(2)**
-
-The current convention is explicitly fixed as
-
-$$I_{s,k}>0\iff\mathrm{discharge}.$$
-
-**(3)**
+**Equation (3):** $I_{s,k}>0\iff\mathrm{discharge}.$
 
 Thus, positive current reduces SOC.
 
@@ -649,43 +633,26 @@ Every trajectory also has:
 
 ## Data Partitions and Leakage Prevention
 
-Let the primary split be
+Let the primary split be:
 
-$$p(s)\in\{\mathrm{train},\mathrm{calibration},\mathrm{test}\}.$$
+**Equation (4):** $p(s)\in\{\mathrm{train},\mathrm{calibration},\mathrm{test}\}.$
 
-**(4)**
+Let $q_s^{\mathrm{strict}}\in\{0,1\}$ indicate strict-test membership.
 
-Let
+The evaluation-partition label is defined as follows:
 
-$$q_s^{\mathrm{strict}}\in\{0,1\}$$
+- $\pi(s)=\mathrm{strict\_test}$ when $q_s^{\mathrm{strict}}=1$;
+- $\pi(s)=p(s)$ when $q_s^{\mathrm{strict}}=0$.
 
-indicate strict-test membership.
-
-When $q_s^{\mathrm{strict}}=1$,
-
-$$\pi(s)=\mathrm{strict\_test}.$$
-
-When $q_s^{\mathrm{strict}}=0$,
-
-$$\pi(s)=p(s).$$
-
-**(5)**
+**Equation (5):** $\pi(s)=\mathrm{strict\_test}$ if $q_s^{\mathrm{strict}}=1$, and $\pi(s)=p(s)$ if $q_s^{\mathrm{strict}}=0$.
 
 A fitting trajectory must satisfy all of the following:
 
-$$p(s)\in\{\mathrm{train},\mathrm{calibration}\},$$
+**Equation (6):** $p(s)\in\{\mathrm{train},\mathrm{calibration}\}.$
 
-**(6)**
+**Equation (7):** $q_s^{\mathrm{strict}}=0.$
 
-$$q_s^{\mathrm{strict}}=0,$$
-
-**(7)**
-
-and
-
-$$e_s^{\mathrm{SOC}}=1.$$
-
-**(8)**
+**Equation (8):** $e_s^{\mathrm{SOC}}=1.$
 
 Here, $e_s^{\mathrm{SOC}}$ denotes SOC-fit eligibility.
 
@@ -725,25 +692,19 @@ The global dataset is the concatenation of the three chemistry-specific selectio
 
 For chemistry $c$, the code stores a validated forward OCV grid:
 
-$$\{z_j^{(c)},U_j^{(c)}\}_{j=1}^{M_c}.$$
+$\{z_j^{(c)},U_j^{(c)}\}_{j=1}^{M_c}$.
 
-The forward OCV calculation is implemented by linear interpolation:
+The forward OCV calculation is implemented by linear interpolation.
 
-$$U_{\mathrm{oc}}^{(c)}(z)=\mathrm{interp}(z;z_{\mathrm{grid}}^{(c)},U_{\mathrm{grid}}^{(c)}).$$
+**Equation (9):** $U_{\mathrm{oc}}^{(c)}(z)=\mathrm{interp}(z;z_{\mathrm{grid}}^{(c)},U_{\mathrm{grid}}^{(c)}).$
 
-**(9)**
+Before interpolation, SOC is clipped to the validated support.
 
-Before interpolation, SOC is clipped to the validated support:
+**Equation (10):** $z_{\mathrm{OCV}}=\mathrm{clip}(z,z_{\min}^{(c)},z_{\max}^{(c)}).$
 
-$$z_{\mathrm{OCV}}=\mathrm{clip}(z,z_{\min}^{(c)},z_{\max}^{(c)}).$$
+The inverse OCV calculation is also linear interpolation.
 
-**(10)**
-
-The inverse OCV calculation is also linear interpolation:
-
-$$z_{\mathrm{inv}}^{(c)}(V)=\mathrm{interp}(V;U_{\mathrm{inv}}^{(c)},z_{\mathrm{inv}}^{(c)}).$$
-
-**(11)**
+**Equation (11):** $z_{\mathrm{inv}}^{(c)}(V)=\mathrm{interp}(V;U_{\mathrm{inv}}^{(c)},z_{\mathrm{inv}}^{(c)}).$
 
 Voltage is clipped to the validated inverse support before inversion.
 
@@ -757,35 +718,25 @@ The code uses a hierarchy of initial-SOC evidence.
 
 ### 8.1 Published Initial SOC
 
-When a finite published initial SOC exists and satisfies
+When a finite published initial SOC exists and satisfies:
 
-$$-0.02\le z_{s,0}^{\mathrm{published}}\le1.02,$$
-
-**(12)**
+**Equation (12):** $-0.02\le z_{s,0}^{\mathrm{published}}\le1.02,$
 
 it is used as a directly reliable point anchor.
 
 ### 8.2 Initial-Rest OCV Inversion
 
-The initial window contains the first
+The initial window contains the first $N_{\mathrm{rest}}=5$ samples.
 
-$$N_{\mathrm{rest}}=5$$
+A sample is considered at rest when:
 
-samples.
-
-A sample is considered at rest when
-
-$$|I_{s,k}|\le0.05\ \mathrm{A}.$$
-
-**(13)**
+**Equation (13):** $|I_{s,k}|\le0.05\ \mathrm{A}.$
 
 An initial-rest condition is detected only when all five required initial samples satisfy the rest threshold.
 
-The initial-rest voltage is then
+The initial-rest voltage is:
 
-$$V_{s,0}^{\mathrm{rest}}=\mathrm{median}(V_{s,0},\ldots,V_{s,4}).$$
-
-**(14)**
+**Equation (14):** $V_{s,0}^{\mathrm{rest}}=\mathrm{median}(V_{s,0},\ldots,V_{s,4}).$
 
 The chemistry-specific inverse OCV function converts this voltage to a representative SOC.
 
@@ -797,25 +748,17 @@ For flat or nearly flat OCV regions, the code does not assume that one voltage u
 
 Let $V^\star$ be the nearest OCV-grid voltage to the clipped initial voltage.
 
-Define
+**Equation (15):** $P_s=\{j:U_j^{(c)}-V^\star\le\varepsilon_{\mathrm{OCV}}\}.$
 
-$$P_s=\{j:U_j^{(c)}-V^\star\le\varepsilon_{\mathrm{OCV}}\}.$$
+The implemented tolerance is:
 
-**(15)**
-
-The implemented tolerance is
-
-$$\varepsilon_{\mathrm{OCV}}=\max(10^{-8},10\varepsilon_{\mathrm{mon}}).$$
-
-**(16)**
+**Equation (16):** $\varepsilon_{\mathrm{OCV}}=\max(10^{-8},10\varepsilon_{\mathrm{mon}}).$
 
 The default monotonicity tolerance is $10^{-9}\ \mathrm{V}$.
 
-If at least two grid points satisfy Equation (15), the equivalent initial-SOC interval is
+If at least two grid points satisfy Equation (15), the equivalent initial-SOC interval is:
 
-$$Z_s^{\mathrm{OCV}}=[\min_{j\in P_s}z_j^{(c)},\max_{j\in P_s}z_j^{(c)}].$$
-
-**(17)**
+**Equation (17):** $Z_s^{\mathrm{OCV}}=[\min_{j\in P_s}z_j^{(c)},\max_{j\in P_s}z_j^{(c)}].$
 
 Otherwise, the interval collapses to the representative inverse-OCV value.
 
@@ -823,11 +766,9 @@ Otherwise, the interval collapses to the representative inverse-OCV value.
 
 ## Nonrest Initial Terminal Voltage
 
-When the first five samples do not satisfy the rest condition, the first terminal voltage is inverted provisionally:
+When the first five samples do not satisfy the rest condition, the first terminal voltage is inverted provisionally.
 
-$$z_{s,0}^{\mathrm{provisional}}=z_{\mathrm{inv}}^{(c)}(V_{s,0}).$$
-
-**(18)**
+**Equation (18):** $z_{s,0}^{\mathrm{provisional}}=z_{\mathrm{inv}}^{(c)}(V_{s,0}).$
 
 The code explicitly marks this anchor as not directly reliable. Such a trajectory may be reconstructed for evaluation but is not admitted to parameter fitting.
 
@@ -835,112 +776,74 @@ The code explicitly marks this anchor as not directly reliable. Such a trajector
 
 ## Trapezoidal Coulomb Counting
 
-The code uses a coulombic efficiency of
+The code uses a coulombic efficiency of:
 
-$$\eta=1.$$
+**Equation (19):** $\eta=1.$
 
-**(19)**
+For interval $k$, signed charge throughput in ampere-hours is:
 
-For interval $k$, signed charge throughput in ampere-hours is
+**Equation (20):** $\Delta q_{s,k}^{\mathrm{signed}}=\dfrac{\Delta t_{s,k}(I_{s,k}+I_{s,k+1})}{7200}.$
 
-$$\Delta q_{s,k}^{\mathrm{signed}}=\frac{\Delta t_{s,k}(I_{s,k}+I_{s,k+1})}{7200}.$$
-
-**(20)**
-
-The denominator is
-
-$$7200=2\times3600$$
-
-because the implementation combines:
+The denominator is $7200=2\times3600$ because the implementation combines:
 
 - trapezoidal averaging, giving the factor $1/2$;
 - conversion from ampere-seconds to ampere-hours, giving $1/3600$.
 
-The absolute-throughput increment is
+The absolute-throughput increment is:
 
-$$\Delta q_{s,k}^{\mathrm{abs}}=\frac{\Delta t_{s,k}(|I_{s,k}|+|I_{s,k+1}|)}{7200}.$$
+**Equation (21):** $\Delta q_{s,k}^{\mathrm{abs}}=\dfrac{\Delta t_{s,k}(|I_{s,k}|+|I_{s,k+1}|)}{7200}.$
 
-**(21)**
+Cumulative signed charge is:
 
-Cumulative signed charge is
+**Equation (22):** $q_{s,k}^{\mathrm{signed}}=\sum_{\ell=0}^{k-1}\Delta q_{s,\ell}^{\mathrm{signed}},\qquad q_{s,0}^{\mathrm{signed}}=0.$
 
-$$q_{s,k}^{\mathrm{signed}}=\sum_{\ell=0}^{k-1}\Delta q_{s,\ell}^{\mathrm{signed}},\qquad q_{s,0}^{\mathrm{signed}}=0.$$
+For a positive trajectory capacity $Q_s$, the cumulative SOC drop is:
 
-**(22)**
+**Equation (23):** $d_{s,k}=\dfrac{\eta q_{s,k}^{\mathrm{signed}}}{Q_s}.$
 
-For a positive trajectory capacity $Q_s$, the cumulative SOC drop is
+Raw reconstructed SOC is:
 
-$$d_{s,k}=\frac{\eta q_{s,k}^{\mathrm{signed}}}{Q_s}.$$
+**Equation (24):** $z_{s,k}^{\mathrm{raw}}=z_{s,0}-d_{s,k}.$
 
-**(23)**
+The code also produces a bounded display variable.
 
-Raw reconstructed SOC is
+**Equation (25):** $z_{s,k}^{\mathrm{bounded}}=\mathrm{clip}(z_{s,k}^{\mathrm{raw}},0,1).$
 
-$$z_{s,k}^{\mathrm{raw}}=z_{s,0}-d_{s,k}.$$
+However, the OCV input is not necessarily Equation (25). It is instead clipped to the chemistry-specific OCV support.
 
-**(24)**
-
-The code also produces a bounded display variable:
-
-$$z_{s,k}^{\mathrm{bounded}}=\mathrm{clip}(z_{s,k}^{\mathrm{raw}},0,1).$$
-
-**(25)**
-
-However, the OCV input is not necessarily Equation (25). It is instead clipped to the chemistry-specific OCV support:
-
-$$z_{s,k}^{\mathrm{OCV}}=\mathrm{clip}(z_{s,k}^{\mathrm{raw}},z_{\min}^{(c)},z_{\max}^{(c)}).$$
-
-**(26)**
+**Equation (26):** $z_{s,k}^{\mathrm{OCV}}=\mathrm{clip}(z_{s,k}^{\mathrm{raw}},z_{\min}^{(c)},z_{\max}^{(c)}).$
 
 ---
 
 ## Charge-Balance-Consistent Initial-SOC Interval
 
-Because
+Because $z_{s,k}^{\mathrm{raw}}=z_{s,0}-d_{s,k}$, the requirement that all reconstructed SOC values remain inside the chemistry-specific OCV support is:
 
-$$z_{s,k}^{\mathrm{raw}}=z_{s,0}-d_{s,k},$$
+**Equation (27):** $z_{\min}^{(c)}\le z_{s,0}-d_{s,k}\le z_{\max}^{(c)}.$
 
-the requirement that all reconstructed SOC values remain inside the chemistry-specific OCV support is
+Therefore, the initial SOC must satisfy:
 
-$$z_{\min}^{(c)}\le z_{s,0}-d_{s,k}\le z_{\max}^{(c)}.$$
-
-**(27)**
-
-Therefore, the initial SOC must satisfy
-
-$$z_{s,0}\ge z_{\min}^{(c)}+\max_k d_{s,k},$$
-
-**(28)**
+**Equation (28):** $z_{s,0}\ge z_{\min}^{(c)}+\max_k d_{s,k}.$
 
 and
 
-$$z_{s,0}\le z_{\max}^{(c)}+\min_k d_{s,k}.$$
+**Equation (29):** $z_{s,0}\le z_{\max}^{(c)}+\min_k d_{s,k}.$
 
-**(29)**
+The current-profile-feasible interval is therefore:
 
-The current-profile-feasible interval is therefore
+**Equation (30):** $Z_s^F=[z_{\min}^{(c)}+\max_k d_{s,k},z_{\max}^{(c)}+\min_k d_{s,k}].$
 
-$$Z_s^F=[z_{\min}^{(c)}+\max_k d_{s,k},z_{\max}^{(c)}+\min_k d_{s,k}].$$
+A feasible interval exists when:
 
-**(30)**
+**Equation (31):** $\underline{z}_s^F\le\overline{z}_s^F+10^{-10}.$
 
-A feasible interval exists when
+The code intersects the OCV-supported initial interval and the charge-balance interval.
 
-$$\underline{z}_s^F\le\overline{z}_s^F+10^{-10}.$$
+**Equation (32):** $Z_s^I=Z_s^{\mathrm{OCV}}\cap Z_s^F.$
 
-**(31)**
+If the anchor is directly reliable and the intersection is nonempty, the selected initial SOC is:
 
-The code intersects the OCV-supported initial interval and the charge-balance interval:
-
-$$Z_s^I=Z_s^{\mathrm{OCV}}\cap Z_s^F.$$
-
-**(32)**
-
-If the anchor is directly reliable and the intersection is nonempty, the selected initial SOC is
-
-$$z_{s,0}=\mathrm{clip}(z_{s,0}^{\mathrm{rep}},\underline{z}_s^I,\overline{z}_s^I).$$
-
-**(33)**
+**Equation (33):** $z_{s,0}=\mathrm{clip}(z_{s,0}^{\mathrm{rep}},\underline{z}_s^I,\overline{z}_s^I).$
 
 The trajectory is fit eligible only when:
 
@@ -960,11 +863,9 @@ The code reports:
 
 The code does not fit every eligible training trajectory. It constructs a representative and computationally manageable subset.
 
-For trajectory $s$, the excitation score is
+For trajectory $s$, the excitation score is:
 
-$$E_s=\log(1+Q_{s,\mathrm{abs}})+\log(1+\sigma_{I,s})+3\Delta z_s+0.05\Delta T_s+0.10\log(1+D_s).$$
-
-**(34)**
+**Equation (34):** $E_s=\log(1+Q_{s,\mathrm{abs}})+\log(1+\sigma_{I,s})+3\Delta z_s+0.05\Delta T_s+0.10\log(1+D_s).$
 
 Here:
 
@@ -979,23 +880,16 @@ For each chemistry, the code selects at most:
 - 250 training trajectories;
 - 100 calibration trajectories.
 
-Approximately 70% of each selection is taken from the highest excitation scores:
+Approximately 70% of each selection is taken from the highest excitation scores.
 
-$$n_{\mathrm{high}}=\min[n_{\mathrm{target}},\max(1,\mathrm{round}(0.70n_{\mathrm{target}}))].$$
-
-**(35)**
+**Equation (35):** $n_{\mathrm{high}}=\min[n_{\mathrm{target}},\max(1,\mathrm{round}(0.70n_{\mathrm{target}}))].$
 
 The remaining 30% is selected across five excitation-percentile strata to retain broader operating coverage.
 
 The executed selection gives, for each chemistry:
 
-$$175+75=250$$
-
-training trajectories and
-
-$$70+30=100$$
-
-calibration trajectories.
+- $175+75=250$ training trajectories;
+- $70+30=100$ calibration trajectories.
 
 ---
 
@@ -1003,23 +897,17 @@ calibration trajectories.
 
 For a trajectory with $N_s$ samples, sample zero is excluded from fitting because it is used for polarization-state initialization.
 
-The available residual count is
+The available residual count is:
 
-$$N_s-1.$$
+**Equation (36):** $N_s-1.$
 
-**(36)**
+The number retained for fitting is:
 
-The number retained for fitting is
+**Equation (37):** $M_s=\min(N_s-1,700).$
 
-$$M_s=\min(N_s-1,700).$$
+The code creates approximately evenly spaced integer indices.
 
-**(37)**
-
-The code creates approximately evenly spaced integer indices:
-
-$$K_s=\mathrm{unique}[\mathrm{linspace}(1,N_s-1,M_s)].$$
-
-**(38)**
+**Equation (38):** $K_s=\mathrm{unique}[\mathrm{linspace}(1,N_s-1,M_s)].$
 
 Thus, the optimization does not simply use the first 700 observations. It distributes fitting residuals across the entire trajectory.
 
@@ -1027,37 +915,25 @@ Thus, the optimization does not simply use the first 700 observations. It distri
 
 ## Trajectory and Chemistry Weighting
 
-A trajectory with
+A trajectory with $m_s=|K_s|$ fitting residuals receives a trajectory weight.
 
-$$m_s=|K_s|$$
+**Equation (39):** $w_s^{\mathrm{traj}}=\dfrac{1}{m_s}.$
 
-fitting residuals receives a trajectory weight
+If chemistry $c$ contributes $n_c$ selected trajectories, it receives chemistry weight.
 
-$$w_s^{\mathrm{traj}}=\frac{1}{m_s}.$$
+**Equation (40):** $w_c^{\mathrm{chem}}=\dfrac{1}{n_c}.$
 
-**(39)**
+The preliminary weight assigned to every selected residual of trajectory $s$ is:
 
-If chemistry $c$ contributes $n_c$ selected trajectories, it receives chemistry weight
+**Equation (41):** $w_{s,k}=w_s^{\mathrm{traj}}w_{c(s)}^{\mathrm{chem}}.$
 
-$$w_c^{\mathrm{chem}}=\frac{1}{n_c}.$$
+Let $M$ be the total number of selected fitting residuals. The mean preliminary weight is:
 
-**(40)**
+$\bar{w}=\dfrac{1}{M}\sum_{j=1}^{M}w_j.$
 
-The preliminary weight assigned to every selected residual of trajectory $s$ is
+The normalized residual weight is:
 
-$$w_{s,k}=w_s^{\mathrm{traj}}w_{c(s)}^{\mathrm{chem}}.$$
-
-**(41)**
-
-Let $M$ be the total number of selected fitting residuals. Define the mean preliminary weight as
-
-$$\bar{w}=\frac{1}{M}\sum_{j=1}^{M}w_j.$$
-
-The normalized residual weight is
-
-$$w_{s,k}\leftarrow\frac{w_{s,k}}{\bar{w}}.$$
-
-**(42)**
+**Equation (42):** $w_{s,k}\leftarrow\dfrac{w_{s,k}}{\bar{w}}.$
 
 This implementation reduces domination by:
 
@@ -1068,83 +944,53 @@ This implementation reduces domination by:
 
 ## Fixed One-RC Model
 
-The code implements the terminal-voltage equation
+The code implements the terminal-voltage equation.
 
-$$V_{s,k}=U_{s,k}-R_0I_{s,k}-v_{1,s,k}.$$
+**Equation (43):** $V_{s,k}=U_{s,k}-R_0I_{s,k}-v_{1,s,k}.$
 
-**(43)**
+The OCV input is:
 
-where
+$U_{s,k}=U_{\mathrm{oc}}^{(c(s))}(z_{s,k}^{\mathrm{OCV}}).$
 
-$$U_{s,k}=U_{\mathrm{oc}}^{(c(s))}(z_{s,k}^{\mathrm{OCV}}).$$
+For interval $k$, define:
 
-For interval $k$, define
+**Equation (44):** $a_{1,s,k}=\exp\left(-\dfrac{\Delta t_{s,k}}{\tau_1}\right).$
 
-$$a_{1,s,k}=\exp\left(-\frac{\Delta t_{s,k}}{\tau_1}\right).$$
+The exact recursive update is:
 
-**(44)**
+**Equation (45):** $v_{1,s,k+1}=a_{1,s,k}v_{1,s,k}+R_1(1-a_{1,s,k})I_{s,k}.$
 
-The exact recursive update in the code is
+After propagating Equation (45), the next voltage is evaluated using the next-sample current.
 
-$$v_{1,s,k+1}=a_{1,s,k}v_{1,s,k}+R_1(1-a_{1,s,k})I_{s,k}.$$
+**Equation (46):** $V_{s,k+1}=U_{s,k+1}-R_0I_{s,k+1}-v_{1,s,k+1}.$
 
-**(45)**
-
-After propagating Equation (45), the next voltage is evaluated using the next-sample current:
-
-$$V_{s,k+1}=U_{s,k+1}-R_0I_{s,k+1}-v_{1,s,k+1}.$$
-
-**(46)**
-
-The parameters
-
-$$R_0,\ R_1,\ \tau_1$$
-
-are constant over every sample in the assigned scope.
+The parameters $R_0$, $R_1$, and $\tau_1$ are constant over every sample in the assigned scope.
 
 ---
 
 ## Fixed Two-RC Model
 
-The two-RC terminal-voltage equation is
+The two-RC terminal-voltage equation is:
 
-$$V_{s,k}=U_{s,k}-R_0I_{s,k}-v_{1,s,k}-v_{2,s,k}.$$
+**Equation (47):** $V_{s,k}=U_{s,k}-R_0I_{s,k}-v_{1,s,k}-v_{2,s,k}.$
 
-**(47)**
+Define:
 
-Define
+**Equation (48):** $a_{1,s,k}=\exp\left(-\dfrac{\Delta t_{s,k}}{\tau_1}\right).$
 
-$$a_{1,s,k}=\exp\left(-\frac{\Delta t_{s,k}}{\tau_1}\right),$$
+**Equation (49):** $a_{2,s,k}=\exp\left(-\dfrac{\Delta t_{s,k}}{\tau_2}\right).$
 
-**(48)**
+The implemented recursions are:
 
-and
+**Equation (50):** $v_{1,s,k+1}=a_{1,s,k}v_{1,s,k}+R_1(1-a_{1,s,k})I_{s,k}.$
 
-$$a_{2,s,k}=\exp\left(-\frac{\Delta t_{s,k}}{\tau_2}\right).$$
+**Equation (51):** $v_{2,s,k+1}=a_{2,s,k}v_{2,s,k}+R_2(1-a_{2,s,k})I_{s,k}.$
 
-**(49)**
+The next-sample prediction is:
 
-The implemented recursions are
+**Equation (52):** $V_{s,k+1}=U_{s,k+1}-R_0I_{s,k+1}-v_{1,s,k+1}-v_{2,s,k+1}.$
 
-$$v_{1,s,k+1}=a_{1,s,k}v_{1,s,k}+R_1(1-a_{1,s,k})I_{s,k},$$
-
-**(50)**
-
-and
-
-$$v_{2,s,k+1}=a_{2,s,k}v_{2,s,k}+R_2(1-a_{2,s,k})I_{s,k}.$$
-
-**(51)**
-
-The next-sample prediction is
-
-$$V_{s,k+1}=U_{s,k+1}-R_0I_{s,k+1}-v_{1,s,k+1}-v_{2,s,k+1}.$$
-
-**(52)**
-
-No SOC, current, temperature, elapsed-time, or trajectory dependence is introduced into
-
-$$R_0,\ R_1,\ R_2,\ \tau_1,\ \tau_2.$$
+No SOC, current, temperature, elapsed-time, or trajectory dependence is introduced into $R_0$, $R_1$, $R_2$, $\tau_1$, or $\tau_2$.
 
 They remain fixed within the scope.
 
@@ -1158,17 +1004,13 @@ It does not reset the state at later samples.
 
 ### 16.1 One-RC Initialization
 
-The code defines
+The code defines:
 
-$$v_{1,s,0}=U_{s,0}-R_0I_{s,0}-V_{s,0}.$$
+**Equation (53):** $v_{1,s,0}=U_{s,0}-R_0I_{s,0}-V_{s,0}.$
 
-**(53)**
+Substitution into Equation (43) gives:
 
-Substitution into Equation (43) gives
-
-$$V_{s,0}=V_{s,0}.$$
-
-**(54)**
+**Equation (54):** $V_{s,0}=V_{s,0}.$
 
 Thus, the initial prediction residual is forced to zero up to floating-point precision.
 
@@ -1176,39 +1018,27 @@ Thus, the initial prediction residual is forced to zero up to floating-point pre
 
 First define total initial polarization:
 
-$$v_{\Sigma,s,0}=U_{s,0}-R_0I_{s,0}-V_{s,0}.$$
+**Equation (55):** $v_{\Sigma,s,0}=U_{s,0}-R_0I_{s,0}-V_{s,0}.$
 
-**(55)**
+The code divides this value according to the branch resistances.
 
-The code divides this value according to the branch resistances:
+**Equation (56):** $v_{1,s,0}=\dfrac{R_1}{R_1+R_2}v_{\Sigma,s,0}.$
 
-$$v_{1,s,0}=\frac{R_1}{R_1+R_2}v_{\Sigma,s,0},$$
+**Equation (57):** $v_{2,s,0}=\dfrac{R_2}{R_1+R_2}v_{\Sigma,s,0}.$
 
-**(56)**
+Therefore:
 
-and
-
-$$v_{2,s,0}=\frac{R_2}{R_1+R_2}v_{\Sigma,s,0}.$$
-
-**(57)**
-
-Therefore,
-
-$$v_{1,s,0}+v_{2,s,0}=v_{\Sigma,s,0},$$
+$v_{1,s,0}+v_{2,s,0}=v_{\Sigma,s,0}$,
 
 and
 
-$$V_{s,0}=V_{s,0}.$$
-
-**(58)**
+**Equation (58):** $V_{s,0}=V_{s,0}.$
 
 The first sample is excluded from fitting and formal free-run evaluation.
 
-The evaluation set for trajectory $s$ is therefore
+The evaluation set for trajectory $s$ is:
 
-$$E_s=\{1,\ldots,N_s-1\}.$$
-
-**(59)**
+**Equation (59):** $E_s=\{1,\ldots,N_s-1\}.$
 
 ---
 
@@ -1218,95 +1048,61 @@ The optimizer operates in logarithmic coordinates.
 
 ### 17.1 One-RC Parameter Vector
 
-The transformed vector is
+The transformed vector is:
 
-$$\xi_1=(\log R_0,\log R_1,\log\tau_1)^T.$$
+**Equation (60):** $\xi_1=(\log R_0,\log R_1,\log\tau_1)^T.$
 
-**(60)**
+The decoded parameters are:
 
-The decoded parameters are
+**Equation (61):** $R_0=e^{\xi_1},\qquad R_1=e^{\xi_2},\qquad\tau_1=e^{\xi_3}.$
 
-$$R_0=e^{\xi_1},\qquad R_1=e^{\xi_2},\qquad\tau_1=e^{\xi_3}.$$
+The derived capacitance is:
 
-**(61)**
-
-The derived capacitance is
-
-$$C_1=\frac{\tau_1}{R_1}.$$
-
-**(62)**
+**Equation (62):** $C_1=\dfrac{\tau_1}{R_1}.$
 
 ### 17.2 Two-RC Parameter Vector
 
-The transformed vector is
+The transformed vector is:
 
-$$\xi_2=(\log R_0,\log R_1,\log R_2,\log\tau_1,\log\tau_{\mathrm{gap}})^T.$$
+**Equation (63):** $\xi_2=(\log R_0,\log R_1,\log R_2,\log\tau_1,\log\tau_{\mathrm{gap}})^T.$
 
-**(63)**
+The physical parameters are:
 
-The physical parameters are
+**Equation (64):** $R_0=e^{\xi_1},\qquad R_1=e^{\xi_2},\qquad R_2=e^{\xi_3}.$
 
-$$R_0=e^{\xi_1},\qquad R_1=e^{\xi_2},\qquad R_2=e^{\xi_3},$$
+**Equation (65):** $\tau_1=e^{\xi_4}.$
 
-**(64)**
+**Equation (66):** $\tau_{\mathrm{gap}}=e^{\xi_5}.$
 
-$$\tau_1=e^{\xi_4},$$
+**Equation (67):** $\tau_2=\tau_1+\tau_{\mathrm{gap}}.$
 
-**(65)**
+The capacitances are:
 
-$$\tau_{\mathrm{gap}}=e^{\xi_5},$$
+**Equation (68):** $C_1=\dfrac{\tau_1}{R_1}.$
 
-**(66)**
+**Equation (69):** $C_2=\dfrac{\tau_2}{R_2}.$
 
-and
+Because $\tau_{\mathrm{gap}}>0$, the code guarantees:
 
-$$\tau_2=\tau_1+\tau_{\mathrm{gap}}.$$
-
-**(67)**
-
-The capacitances are
-
-$$C_1=\frac{\tau_1}{R_1},$$
-
-**(68)**
-
-and
-
-$$C_2=\frac{\tau_2}{R_2}.$$
-
-**(69)**
-
-Because
-
-$$\tau_{\mathrm{gap}}>0,$$
-
-the code guarantees
-
-$$\tau_2>\tau_1.$$
-
-**(70)**
+**Equation (70):** $\tau_2>\tau_1.$
 
 ---
 
 ## Candidate Scopes
 
-The code estimates fixed models for
+The code estimates fixed models for:
 
-$$q\in\{\mathrm{GLOBAL},\mathrm{LFP},\mathrm{NCA},\mathrm{NMC}\}.$$
+**Equation (75):** $q\in\{\mathrm{GLOBAL},\mathrm{LFP},\mathrm{NCA},\mathrm{NMC}\}.$
 
-**(75)**
+For the global candidate:
 
-For the global candidate,
-
-$$\xi_s=\xi_{\mathrm{GLOBAL}}$$
+$\xi_s=\xi_{\mathrm{GLOBAL}}$
 
 for all chemistries.
 
-For a chemistry-specific candidate,
+For a chemistry-specific candidate:
 
-$$\xi_s=\xi_{c(s)}.$$
-
-**(76)**
+**Equation (76):** $\xi_s=\xi_{c(s)}.$
 
 The eight fitted candidate families are:
 
@@ -1319,54 +1115,44 @@ The eight fitted candidate families are:
 - `NMC 1RC`;
 - `NMC 2RC`.
 
-**(77)**
+**Equation (77):** The candidate set contains the eight scope-and-order combinations listed above.
 
 ---
 
 ## Voltage Residual and Robust Objective
 
-The signed residual is
+The signed residual is:
 
-$$e_{s,k}=V_{s,k}-\widehat{V}_{s,k}.$$
-
-**(78)**
+**Equation (78):** $e_{s,k}=V_{s,k}-\widehat{V}_{s,k}.$
 
 Thus:
 
 - $e_{s,k}>0$: predicted voltage is too low;
 - $e_{s,k}<0$: predicted voltage is too high.
 
-The weighted fitting residual is
+The weighted fitting residual is:
 
-$$r_{s,k}=w_{s,k}e_{s,k}.$$
+**Equation (79):** $r_{s,k}=w_{s,k}e_{s,k}.$
 
-**(79)**
+The code uses a Huber scale of:
 
-The code uses a Huber scale of
+**Equation (80):** $\delta=0.020\ \mathrm{V}.$
 
-$$\delta=0.020\ \mathrm{V}.$$
+For $|r|\le\delta$, the implemented Huber loss is:
 
-**(80)**
+$\ell_\delta(r)=\dfrac{1}{2}r^2.$
 
-For $|r|\le\delta$, the implemented Huber loss is
+For $|r|>\delta$, the implemented Huber loss is:
 
-$$\ell_\delta(r)=\frac{1}{2}r^2.$$
+$\ell_\delta(r)=\delta|r|-\dfrac{1}{2}\delta^2.$
 
-For $|r|>\delta$, the implemented Huber loss is
+**Equation (81):** The Huber loss uses the quadratic expression inside the threshold and the linear expression outside the threshold.
 
-$$\ell_\delta(r)=\delta|r|-\frac{1}{2}\delta^2.$$
+For scope $q$ and model order $m$, define:
 
-**(81)**
+$J_{q,m}(\xi)=\sum_{s\in S_{\mathrm{train},q}}\sum_{k\in K_s}\ell_{0.020}(w_{s,k}[V_{s,k}-\widehat{V}_{s,k}(\xi)]).$
 
-For scope $q$ and model order $m$, define
-
-$$J_{q,m}(\xi)=\sum_{s\in S_{\mathrm{train},q}}\sum_{k\in K_s}\ell_{0.020}(w_{s,k}[V_{s,k}-\widehat{V}_{s,k}(\xi)]).$$
-
-The estimated parameter vector is the bounded value of $\xi$ that minimizes $J_{q,m}(\xi)$:
-
-$$\widehat{\xi}_{q,m}=\mathrm{argmin}_{\underline{\xi}_m\le\xi\le\overline{\xi}_m}J_{q,m}(\xi).$$
-
-**(82)**
+**Equation (82):** The estimate $\widehat{\xi}_{q,m}$ is the bounded value of $\xi$ that minimizes $J_{q,m}(\xi)$ over $\underline{\xi}_m\le\xi\le\overline{\xi}_m$.
 
 ---
 
@@ -1402,23 +1188,15 @@ The `optimizer_success` flag is stored, but a solution can still be considered a
 
 ## Multi-Start Initialization
 
-For the one-RC model, the nominal initial point is
+For the one-RC model, the nominal initial point is:
 
-$$R_0=0.015\ \Omega,\qquad R_1=0.010\ \Omega,\qquad\tau_1=20\ \mathrm{s}.$$
+**Equation (83):** $R_0=0.015\ \Omega,\qquad R_1=0.010\ \Omega,\qquad\tau_1=20\ \mathrm{s}.$
 
-**(83)**
+For the two-RC model, the nominal point is:
 
-For the two-RC model, the nominal point is
+**Equation (84):** $R_0=0.015\ \Omega,\qquad R_1=0.008\ \Omega,\qquad R_2=0.015\ \Omega,\qquad\tau_1=5\ \mathrm{s},\qquad\tau_2=105\ \mathrm{s}.$
 
-$$R_0=0.015\ \Omega,\qquad R_1=0.008\ \Omega,\qquad R_2=0.015\ \Omega,$$
-
-$$\tau_1=5\ \mathrm{s},\qquad\tau_2=105\ \mathrm{s}.$$
-
-**(84)**
-
-This implies an initial gap of
-
-$$\tau_{\mathrm{gap}}=100\ \mathrm{s}.$$
+This implies an initial gap of $\tau_{\mathrm{gap}}=100\ \mathrm{s}$.
 
 The remaining starts are sampled uniformly in transformed log-parameter space between the transformed bounds.
 
@@ -1426,7 +1204,7 @@ The random seed is inherited from Notebook 10:
 
 `RANDOM_SEED = 42`
 
-**(85)**
+**Equation (85):** $\mathrm{RANDOM\_SEED}=42.$
 
 The executed model fitting comprises 64 starts.
 
@@ -1443,17 +1221,13 @@ Within each scope and model order, valid starts are sorted in the following exac
 5. optimizer cost;
 6. start index.
 
-For trajectory $s$, free-run RMSE is
+For trajectory $s$, free-run RMSE is:
 
-$$\mathrm{RMSE}_s=\sqrt{\frac{1}{N_s-1}\sum_{k=1}^{N_s-1}e_{s,k}^2}.$$
+**Equation (86):** $\mathrm{RMSE}_s=\sqrt{\dfrac{1}{N_s-1}\sum_{k=1}^{N_s-1}e_{s,k}^2}.$
 
-**(86)**
+The trajectory-weighted RMSE is:
 
-The trajectory-weighted RMSE is
-
-$$\mathrm{RMSE}_{\mathrm{traj}}=\frac{1}{S}\sum_{s=1}^{S}\mathrm{RMSE}_s.$$
-
-**(87)**
+**Equation (87):** $\mathrm{RMSE}_{\mathrm{traj}}=\dfrac{1}{S}\sum_{s=1}^{S}\mathrm{RMSE}_s.$
 
 Every trajectory receives equal weight in Equation (87), regardless of its sample count.
 
@@ -1461,43 +1235,31 @@ Every trajectory receives equal weight in Equation (87), regardless of its sampl
 
 ## Calibration-Stage Model Selection
 
-For reference model $A$ and candidate model $B$, relative calibration improvement is
+For reference model $A$ and candidate model $B$, relative calibration improvement is:
 
-$$I_{A\rightarrow B}=\frac{\mathrm{RMSE}_A^{\mathrm{traj}}-\mathrm{RMSE}_B^{\mathrm{traj}}}{\mathrm{RMSE}_A^{\mathrm{traj}}}.$$
+**Equation (88):** $I_{A\rightarrow B}=\dfrac{\mathrm{RMSE}_A^{\mathrm{traj}}-\mathrm{RMSE}_B^{\mathrm{traj}}}{\mathrm{RMSE}_A^{\mathrm{traj}}}.$
 
-**(88)**
+The code uses a minimum improvement of:
 
-The code uses a minimum improvement of
+**Equation (89):** $0.01.$
 
-$$0.01.$$
+A global two-RC model replaces the global one-RC model only if:
 
-**(89)**
+**Equation (90):** $I_{\mathrm{global\ 1RC}\rightarrow\mathrm{global\ 2RC}}\ge0.01.$
 
-A global two-RC model replaces the global one-RC model only if
+A chemistry-specific two-RC model replaces the chemistry-specific one-RC model only if:
 
-$$I_{\mathrm{global\ 1RC}\rightarrow\mathrm{global\ 2RC}}\ge0.01.$$
+**Equation (91):** $I_{\mathrm{specific\ 1RC}\rightarrow\mathrm{specific\ 2RC}}\ge0.01.$
 
-**(90)**
+The selected chemistry-specific model replaces the selected global model only if:
 
-A chemistry-specific two-RC model replaces the chemistry-specific one-RC model only if
-
-$$I_{\mathrm{specific\ 1RC}\rightarrow\mathrm{specific\ 2RC}}\ge0.01.$$
-
-**(91)**
-
-The selected chemistry-specific model replaces the selected global model only if
-
-$$I_{\mathrm{selected\ global}\rightarrow\mathrm{selected\ chemistry}}\ge0.01.$$
-
-**(92)**
+**Equation (92):** $I_{\mathrm{selected\ global}\rightarrow\mathrm{selected\ chemistry}}\ge0.01.$
 
 This produces an automatic parsimonious candidate for each chemistry.
 
-Separately, the code preserves the chemistry-specific two-RC model as the primary fixed baseline:
+Separately, the code preserves the chemistry-specific two-RC model as the primary fixed baseline.
 
-$$M_{\mathrm{primary}}^{(c)}=M_{\mathrm{specific,2RC}}^{(c)}.$$
-
-**(93)**
+**Equation (93):** $M_{\mathrm{primary}}^{(c)}=M_{\mathrm{specific,2RC}}^{(c)}.$
 
 All candidate parameters are frozen before ordinary-test and strict-test evaluation.
 
@@ -1535,63 +1297,37 @@ Let $N$ be the number of evaluated samples in a group.
 
 ### 26.1 Bias
 
-$$\mathrm{Bias}=\frac{1}{N}\sum_{i=1}^{N}e_i.$$
-
-**(94)**
+**Equation (94):** $\mathrm{Bias}=\dfrac{1}{N}\sum_{i=1}^{N}e_i.$
 
 ### 26.2 Root-Mean-Square Error
 
-$$\mathrm{RMSE}=\sqrt{\frac{1}{N}\sum_{i=1}^{N}e_i^2}.$$
-
-**(95)**
+**Equation (95):** $\mathrm{RMSE}=\sqrt{\dfrac{1}{N}\sum_{i=1}^{N}e_i^2}.$
 
 ### 26.3 Mean Absolute Error
 
-$$\mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}|e_i|.$$
-
-**(96)**
+**Equation (96):** $\mathrm{MAE}=\dfrac{1}{N}\sum_{i=1}^{N}|e_i|.$
 
 ### 26.4 Residual Standard Deviation
 
-The code uses the population standard deviation:
+The code uses the population standard deviation.
 
-$$\sigma_e=\sqrt{\frac{1}{N}\sum_{i=1}^{N}(e_i-\bar{e})^2}.$$
-
-**(97)**
+**Equation (97):** $\sigma_e=\sqrt{\dfrac{1}{N}\sum_{i=1}^{N}(e_i-\bar{e})^2}.$
 
 ### 26.5 Median and Upper-Tail Absolute Errors
 
-The code calculates:
+**Equation (98):** $\mathrm{MedAE}=\mathrm{median}(|e_i|).$
 
-$$\mathrm{MedAE}=\mathrm{median}(|e_i|),$$
+**Equation (99):** $P_{95}=q_{0.95}(|e_i|).$
 
-**(98)**
+**Equation (100):** $P_{99}=q_{0.99}(|e_i|).$
 
-$$P_{95}=q_{0.95}(|e_i|),$$
-
-**(99)**
-
-$$P_{99}=q_{0.99}(|e_i|),$$
-
-**(100)**
-
-and
-
-$$E_{\max}=\max_i|e_i|.$$
-
-**(101)**
+**Equation (101):** $E_{\max}=\max_i|e_i|.$
 
 ### 26.6 Normalized RMSE
 
-Let
+Let $\Delta V=V_{\max}-V_{\min}$.
 
-$$\Delta V=V_{\max}-V_{\min}.$$
-
-The implemented normalized RMSE is
-
-$$\mathrm{NRMSE}=\frac{\mathrm{RMSE}}{\Delta V}.$$
-
-**(102)**
+**Equation (102):** $\mathrm{NRMSE}=\dfrac{\mathrm{RMSE}}{\Delta V}.$
 
 This metric is defined when $\Delta V>0$.
 
@@ -1599,46 +1335,29 @@ The code does not compute $R^2$ in the fixed-ECM metric function.
 
 ### 26.7 Lag-One Residual Autocorrelation
 
-Let
+Let $\widetilde{e}_i=e_i-\bar{e}$.
 
-$$\widetilde{e}_i=e_i-\bar{e}.$$
+**Equation (103):** $\rho_1=\dfrac{\sum_{i=1}^{N-1}\widetilde{e}_{i-1}\widetilde{e}_i}{\sum_{i=0}^{N-1}\widetilde{e}_i^2}.$
 
-The implemented lag-one statistic is
+---
 
-$$\rho_1=\frac{\sum_{i=1}^{N-1}\widetilde{e}_{i-1}\widetilde{e}_i}{\sum_{i=0}^{N-1}\widetilde{e}_i^2}.$$
+## 27. Residual Operating-Regime Analysis
 
-**(103)**
-
-
-## Residual Operating-Regime Analysis
-
-The code classifies current as follows.
+The code classifies current into charging, rest, and discharging regimes.
 
 For charging:
 
-$$
-g_I(I)=\mathrm{CHARGE},
-\qquad
-I<-0.05.
-$$
+$g_I(I)=\mathrm{CHARGE}$ when $I<-0.05$.
 
 For rest:
 
-$$
-g_I(I)=\mathrm{REST},
-\qquad
-|I|\le0.05.
-$$
+$g_I(I)=\mathrm{REST}$ when $|I|\le0.05$.
 
 For discharging:
 
-$$
-g_I(I)=\mathrm{DISCHARGE},
-\qquad
-I>0.05.
-$$
+$g_I(I)=\mathrm{DISCHARGE}$ when $I>0.05$.
 
-**(104)**
+**Equation (104):** The current-regime function assigns `CHARGE`, `REST`, or `DISCHARGE` according to the thresholds above.
 
 SOC is divided into:
 
@@ -1657,9 +1376,10 @@ Temperature is divided into:
 
 Residual dependence is evaluated against:
 
-$$
-I,\ z,\ T,\ t.
-$$
+- current $I$;
+- SOC $z$;
+- temperature $T$;
+- elapsed time $t$.
 
 ---
 
@@ -1667,222 +1387,100 @@ $$
 
 For operating variable $x_i$, the code accumulates sufficient statistics.
 
-Define
+**Equation (105):** $S_{xx}=N\sum_i x_i^2-\left(\sum_i x_i\right)^2.$
 
-$$
-S_{xx}
-=
-N\sum_i x_i^2
--
-\left(
-\sum_i x_i
-\right)^2.
-$$
+**Equation (106):** $S_{ee}=N\sum_i e_i^2-\left(\sum_i e_i\right)^2.$
 
-**(105)**
+**Equation (107):** $S_{xe}=N\sum_i x_ie_i-\left(\sum_i x_i\right)\left(\sum_i e_i\right).$
 
-Define
+The residual slope is:
 
-$$
-S_{ee}
-=
-N\sum_i e_i^2
--
-\left(
-\sum_i e_i
-\right)^2.
-$$
-
-**(106)**
-
-Define
-
-$$
-S_{xe}
-=
-N\sum_i x_i e_i
--
-\left(
-\sum_i x_i
-\right)
-\left(
-\sum_i e_i
-\right).
-$$
-
-**(107)**
-
-The residual slope is
-
-$$
-\beta_{e\mid x}
-=
-\frac{S_{xe}}{S_{xx}},
-$$
-
-**(108)**
+**Equation (108):** $\beta_{e|x}=\dfrac{S_{xe}}{S_{xx}},$
 
 when $S_{xx}>0$.
 
-The Pearson correlation is
+The Pearson correlation is:
 
-$$
-\rho_{e,x}
-=
-\frac{S_{xe}}
-{\sqrt{S_{xx}S_{ee}}},
-$$
+**Equation (109):** $\rho_{e,x}=\dfrac{S_{xe}}{\sqrt{S_{xx}S_{ee}}},$
 
-**(109)**
+when $S_{xx}S_{ee}>0$.
 
-when the denominator is positive.
+The calculated correlation is clipped numerically to the interval $[-1,1]$.
 
-The value is clipped numerically to
+The maximum residual dependence used in final decisions is:
 
-$$
-[-1,1].
-$$
+**Equation (110):** $\rho_{\max}=\max(|\rho_{e,I}|,|\rho_{e,z}|,|\rho_{e,T}|,|\rho_{e,t}|).$
 
-The maximum residual dependence used in final decisions is
+---
 
-$$
-\rho_{\max}
-=
-\max
-\left(
-|\rho_{e,I}|,
-|\rho_{e,z}|,
-|\rho_{e,T}|,
-|\rho_{e,t}|
-\right).
-$$
+## 29. Practical-Identifiability Analysis
 
-**(110)**
+Identifiability is evaluated using the weighted training residual vector $r(\xi)$.
 
-## Practical-Identifiability Analysis
+The numerical Jacobian is evaluated at the frozen parameter estimate.
 
-Identifiability is evaluated using the weighted training residual vector:
+**Equation (111):** $J=\left.\dfrac{\partial r}{\partial\xi^T}\right|_{\xi=\widehat{\xi}}.$
 
-$$
-r(\xi).
-$$
+For transformed parameter $\xi_j$, the proposed finite-difference step is:
 
-The numerical Jacobian is
+**Equation (112):** $h_j=\max(10^{-6},10^{-4}\max(1,|\widehat{\xi}_j|)).$
 
-$$
-J
-=
-\left.
-\frac{\partial r}{\partial \xi^T}
-\right|_{\xi=\widehat{\xi}}.
-$$
+When both sides are sufficiently far from the parameter bounds, the code uses the central-difference approximation.
 
-**(111)**
+**Equation (113):** $J_{:,j}\approx\dfrac{r(\widehat{\xi}+h_je_j)-r(\widehat{\xi}-h_je_j)}{2h_j}.$
 
-For transformed parameter $\xi_j$, the proposed finite-difference step is
+Here, $e_j$ is the unit vector associated with transformed parameter $j$.
 
-$$
-h_j
-=
-\max
-\left[
-10^{-6},
-10^{-4}\max
-\left(
-1,
-|\widehat{\xi}_j|
-\right)
-\right].
-$$
+The finite-difference step may be reduced to 45% of the available distance to either parameter bound.
 
-**(112)**
+Near a bound, the code uses a one-sided forward or backward difference.
 
-When both sides are sufficiently far from the bounds, the code uses a central difference:
+Forward difference:
 
-$$
-J_{:,j}
-\approx
-\frac{
-r(\widehat{\xi}+h_je_j)
--
-r(\widehat{\xi}-h_je_j)
-}{
-2h_j
-}.
-$$
+$J_{:,j}\approx\dfrac{r(\widehat{\xi}+h_je_j)-r(\widehat{\xi})}{h_j}.$
 
-**(113)**
+Backward difference:
 
-The step may be reduced to 45% of the available distance to either bound.
-
-Near a bound, a one-sided forward or backward difference is used.
+$J_{:,j}\approx\dfrac{r(\widehat{\xi})-r(\widehat{\xi}-h_je_j)}{h_j}.$
 
 ---
 
 ## 30. Singular-Value and Rank Diagnostics
 
-The code computes
+The code computes the singular-value decomposition.
 
-$$
-J
-=
-U\Sigma W^T.
-$$
+**Equation (114):** $J=U\Sigma W^T.$
 
-**(114)**
+The singular-value matrix is:
 
-where
+$\Sigma=\mathrm{diag}(\sigma_1,\ldots,\sigma_p)$,
 
-$$
-\Sigma
-=
-\mathrm{diag}
-(\sigma_1,\ldots,\sigma_p),
-\qquad
-\sigma_1\ge\cdots\ge\sigma_p.
-$$
+with:
 
-The numerical-rank tolerance is
+$\sigma_1\ge\cdots\ge\sigma_p$.
 
-$$
-\varepsilon_{\mathrm{num}}
-=
-\max(N,p)\,
-\varepsilon_{\mathrm{mach}}\,
-\sigma_1.
-$$
+The numerical-rank tolerance is:
 
-**(115)**
+**Equation (115):** $\varepsilon_{\mathrm{num}}=\max(N,p)\varepsilon_{\mathrm{mach}}\sigma_1.$
 
-The practical tolerance is
+Here:
 
-$$
-\varepsilon_{\mathrm{prac}}
-=
-10^{-6}\sigma_1.
-$$
+- $N$ is the number of weighted training residuals;
+- $p$ is the number of transformed parameters;
+- $\varepsilon_{\mathrm{mach}}$ is machine precision;
+- $\sigma_1$ is the largest singular value.
 
-**(116)**
+The practical singular-value tolerance is:
 
-Practical rank is
+**Equation (116):** $\varepsilon_{\mathrm{prac}}=10^{-6}\sigma_1.$
 
-$$
-r_{\mathrm{prac}}
-=
-\#\{j:\sigma_j>\varepsilon_{\mathrm{prac}}\}.
-$$
+Practical rank is the number of singular values greater than the practical tolerance.
 
-**(117)**
+**Equation (117):** $r_{\mathrm{prac}}=|\{j:\sigma_j>\varepsilon_{\mathrm{prac}}\}|.$
 
-The condition number is
+The Jacobian condition number is:
 
-$$
-\kappa_J
-=
-\frac{\sigma_1}{\sigma_p}.
-$$
-
-**(118)**
+**Equation (118):** $\kappa_J=\dfrac{\sigma_1}{\sigma_p}.$
 
 When the smallest singular value is zero or numerically unusable, the condition number is treated as nonfinite.
 
@@ -1890,306 +1488,131 @@ When the smallest singular value is zero or numerically unusable, the condition 
 
 ## 31. Local Covariance and Parameter Correlations
 
-The information matrix is
+The local information matrix is:
 
-$$
-I
-=
-J^TJ.
-$$
+**Equation (119):** $I=J^TJ.$
 
-**(119)**
+The weighted residual sum of squares is:
 
-The weighted residual sum of squares is
+**Equation (120):** $\mathrm{RSS}=r^Tr.$
 
-$$
-\mathrm{RSS}
-=
-r^Tr.
-$$
+The residual degrees of freedom are:
 
-**(120)**
+**Equation (121):** $\nu=N-r_{\mathrm{prac}}.$
 
-With degrees of freedom
+The residual-variance estimate is:
 
-$$
-\nu
-=
-N-r_{\mathrm{prac}},
-$$
+**Equation (122):** $\sigma_r^2=\dfrac{\mathrm{RSS}}{\nu}.$
 
-**(121)**
+The transformed-parameter covariance approximation is:
 
-the residual-variance estimate is
+**Equation (123):** $\Sigma_\xi=\sigma_r^2(J^TJ)^+.$
 
-$$
-\sigma_r^2
-=
-\frac{\mathrm{RSS}}{\nu}.
-$$
+The superscript $+$ denotes the Moore-Penrose pseudoinverse.
 
-**(122)**
+The standard error of transformed parameter $\xi_j$ is:
 
-The transformed-parameter covariance approximation is
+**Equation (124):** $\mathrm{SE}(\xi_j)=\sqrt{[\Sigma_\xi]_{jj}}.$
 
-$$
-\Sigma_\xi
-=
-\sigma_r^2
-(J^TJ)^+.
-$$
+The transformed-parameter correlation is:
 
-**(123)**
+**Equation (125):** $\mathrm{Corr}(\xi_i,\xi_j)=\dfrac{[\Sigma_\xi]_{ij}}{\sqrt{[\Sigma_\xi]_{ii}[\Sigma_\xi]_{jj}}}.$
 
-The standard error is
+The maximum absolute off-diagonal transformed-parameter correlation is:
 
-$$
-\mathrm{SE}(\xi_j)
-=
-\sqrt{
-[\Sigma_\xi]_{jj}
-}.
-$$
-
-**(124)**
-
-The transformed-parameter correlation is
-
-$$
-\mathrm{Corr}(\xi_i,\xi_j)
-=
-\frac{
-[\Sigma_\xi]_{ij}
-}{
-\sqrt{
-[\Sigma_\xi]_{ii}
-[\Sigma_\xi]_{jj}
-}
-}.
-$$
-
-**(125)**
+$\rho_{\xi,\max}=\max_{i\ne j}|\mathrm{Corr}(\xi_i,\xi_j)|.$
 
 ---
 
 ## 32. Physical-Parameter Uncertainty
 
-Let
+Let $\vartheta=g(\xi)$ be the decoded physical-parameter vector.
 
-$$
-\vartheta
-=
-g(\xi)
-$$
+For the one-RC model:
 
-be the decoded physical-parameter vector.
+**Equation (126):** $\vartheta_1=(R_0,R_1,\tau_1,C_1)^T.$
 
-For one-RC:
+For the two-RC model:
 
-$$
-\vartheta_1
-=
-\begin{bmatrix}
-R_0 &
-R_1 &
-\tau_1 &
-C_1
-\end{bmatrix}^T.
-$$
+**Equation (127):** $\vartheta_2=(R_0,R_1,R_2,\tau_1,\tau_2,\tau_{\mathrm{gap}},C_1,C_2)^T.$
 
-**(126)**
+Let $G$ denote the Jacobian of the physical-parameter transformation.
 
-For two-RC:
+**Equation (128):** $G=\dfrac{\partial g}{\partial\xi^T}.$
 
-$$
-\vartheta_2
-=
-\begin{bmatrix}
-R_0 &
-R_1 &
-R_2 &
-\tau_1 &
-\tau_2 &
-\tau_{\mathrm{gap}} &
-C_1 &
-C_2
-\end{bmatrix}^T.
-$$
+The physical-parameter covariance is computed using the delta method.
 
-**(127)**
+**Equation (129):** $\Sigma_\vartheta=G\Sigma_\xi G^T.$
 
-Let
+The physical-parameter standard error is:
 
-$$
-G
-=
-\frac{\partial g}{\partial \xi^T}.
-$$
+$\mathrm{SE}(\vartheta_j)=\sqrt{[\Sigma_\vartheta]_{jj}}.$
 
-**(128)**
+The relative standard error is:
 
-The physical covariance is computed by the delta method:
+**Equation (130):** $\mathrm{RSE}(\vartheta_j)=\dfrac{\sqrt{[\Sigma_\vartheta]_{jj}}}{|\vartheta_j|}.$
 
-$$
-\Sigma_\vartheta
-=
-G\Sigma_\xi G^T.
-$$
+The maximum physical relative standard error is:
 
-**(129)**
-
-The relative standard error is
-
-$$
-\mathrm{RSE}(\vartheta_j)
-=
-\frac{
-\sqrt{
-[\Sigma_\vartheta]_{jj}
-}
-}{
-|\vartheta_j|
-}.
-$$
-
-**(130)**
+$\mathrm{RSE}_{\max}=\max_j\mathrm{RSE}(\vartheta_j).$
 
 ---
 
 ## 33. Bound-Proximity Diagnostic
 
-For transformed parameter $\xi_j$ with lower and upper bounds $\ell_j$ and $u_j$, define the normalized distances:
+For transformed parameter $\xi_j$ with lower bound $\ell_j$ and upper bound $u_j$, define the normalized distance from the lower bound as:
 
-$$
-d_j^L
-=
-\frac{
-\widehat{\xi}_j-\ell_j
-}{
-u_j-\ell_j
-},
-$$
+**Equation (131):** $d_j^L=\dfrac{\widehat{\xi}_j-\ell_j}{u_j-\ell_j}.$
 
-**(131)**
+Define the normalized distance from the upper bound as:
 
-and
+**Equation (132):** $d_j^U=\dfrac{u_j-\widehat{\xi}_j}{u_j-\ell_j}.$
 
-$$
-d_j^U
-=
-\frac{
-u_j-\widehat{\xi}_j
-}{
-u_j-\ell_j
-}.
-$$
+The minimum relative distance to either bound is:
 
-**(132)**
+**Equation (133):** $d_j^{\min}=\min(d_j^L,d_j^U).$
 
-The minimum relative distance is
+A parameter is considered near a bound when:
 
-$$
-d_j^{\min}
-=
-\min
-(d_j^L,d_j^U).
-$$
+**Equation (134):** $d_j^{\min}\le0.01.$
 
-**(133)**
-
-A parameter is considered near a bound when
-
-$$
-d_j^{\min}
-\le
-0.01.
-$$
-
-**(134)**
+The code records the number and identities of transformed parameters satisfying this condition.
 
 ---
 
 ## 34. Identifiability Classification
 
-A model is classified `RANK_DEFICIENT` when
+A model is classified as `RANK_DEFICIENT` when:
 
-$$
-r_{\mathrm{prac}}
-<
-p.
-$$
+**Equation (135):** $r_{\mathrm{prac}}<p.$
 
-**(135)**
+For a practically full-rank model, severe weakness exists if any of the following conditions holds:
 
-For a practically full-rank model, severe weakness exists if any of the following holds:
+**Equation (136):** $\kappa_J>10^6.$
 
-$$
-\kappa_J
->
-10^6,
-$$
+**Equation (137):** $\max_{i\ne j}|\mathrm{Corr}(\xi_i,\xi_j)|\ge0.99.$
 
-**(136)**
-
-$$
-\max_{i\ne j}
-|\mathrm{Corr}(\xi_i,\xi_j)|
-\ge
-0.99,
-$$
-
-**(137)**
-
-or
-
-$$
-\max_j
-\mathrm{RSE}(\vartheta_j)
-\ge
-1.
-$$
-
-**(138)**
+**Equation (138):** $\max_j\mathrm{RSE}(\vartheta_j)\ge1.$
 
 The corresponding classification is:
 
 `FULL_RANK_BUT_WEAK`
 
-Moderate concern exists when any of the following holds:
+Moderate identifiability concern exists when any of the following conditions holds:
 
-$$
-\kappa_J
->
-10^4,
-$$
+**Equation (139):** $\kappa_J>10^4.$
 
-**(139)**
+**Equation (140):** $\max_{i\ne j}|\mathrm{Corr}(\xi_i,\xi_j)|\ge0.95.$
 
-$$
-\max_{i\ne j}
-|\mathrm{Corr}(\xi_i,\xi_j)|
-\ge
-0.95,
-$$
+**Equation (141):** $\max_j\mathrm{RSE}(\vartheta_j)\ge0.50.$
 
-**(140)**
-
-$$
-\max_j
-\mathrm{RSE}(\vartheta_j)
-\ge
-0.50,
-$$
-
-**(141)**
-
-or at least one parameter is near a bound.
+Moderate concern also exists when at least one transformed parameter satisfies $d_j^{\min}\le0.01$.
 
 The corresponding classification is:
 
 `FULL_RANK_MODERATE`
 
-Otherwise, the model is classified:
+Otherwise, the model is classified as:
 
 `FULL_RANK_STABLE`
 
@@ -2199,170 +1622,104 @@ Otherwise, the model is classified:
 
 The code evaluates exact nonlinear objective slices using training residuals only.
 
-The multiplier grid is
+The multiplier grid is:
 
-$$
-m
-\in
-\{
--2,
--1.5,
--1,
--0.5,
-0,
-0.5,
-1,
-1.5,
-2
-\}.
-$$
-
-**(142)**
+**Equation (142):** $m\in\{-2,-1.5,-1,-0.5,0,0.5,1,1.5,2\}.$
 
 ### 35.1 Parameter-Axis Direction
 
-For transformed parameter $j$,
+For transformed parameter $j$, the parameter-axis profile is:
 
-$$
-\xi_j(m)
-=
-\widehat{\xi}
-+
-ms_je_j.
-$$
+**Equation (143):** $\xi_j(m)=\widehat{\xi}+ms_je_j.$
 
-**(143)**
+Here:
+
+- $\widehat{\xi}$ is the frozen transformed-parameter estimate;
+- $m$ is the profile multiplier;
+- $s_j$ is the profile scale for parameter $j$;
+- $e_j$ is the unit vector for parameter $j$.
+
+The profile scale is reduced when necessary so that all evaluated profile points remain inside the transformed parameter bounds.
 
 ### 35.2 Weakest Joint Direction
 
-Let $v_{\min}$ be the right singular vector associated with the weakest information direction.
+Let $v_{\min}$ be the right singular vector associated with the smallest singular value of the weighted residual Jacobian.
 
-The code gives it a deterministic sign by making its largest absolute component positive.
+The code gives $v_{\min}$ a deterministic sign by requiring its component with the largest absolute magnitude to be positive.
 
-The weak-direction profile is
+The weakest-direction profile is:
 
-$$
-\xi_w(m)
-=
-\widehat{\xi}
-+
-ms_wv_{\min}.
-$$
+**Equation (144):** $\xi_w(m)=\widehat{\xi}+ms_wv_{\min}.$
 
-**(144)**
+The direction is normalized so that $\|v_{\min}\|_2=1$.
 
-The direction is normalized to unit Euclidean norm.
+The scale $s_w$ is reduced when necessary so that every weakest-direction profile point remains inside the transformed parameter bounds.
 
-The scale is reduced as needed so that every profile point remains inside the transformed bounds.
+The parameter-axis and weakest-direction profiles are conditional objective slices. All transformed parameters not included in the selected direction remain fixed at their frozen values.
+
+---
 
 ## 36. Exact and Linearized Profile Objectives
 
-For perturbation
+For perturbation:
 
-$$\Delta\xi=msd,$$
+**Equation (145):** $\Delta\xi=msd.$
 
-**(145)**
+The exact weighted residual is:
 
-the exact weighted residual is
+**Equation (146):** $r_{\mathrm{exact}}(m)=r(\widehat{\xi}+\Delta\xi).$
 
-$$r_{\mathrm{exact}}(m)=r(\widehat{\xi}+\Delta\xi).$$
+The local linearized residual is:
 
-**(146)**
+**Equation (147):** $r_{\mathrm{lin}}(m)=r_0+J\Delta\xi.$
 
-The local linearized residual is
+The exact weighted residual sum of squares is:
 
-$$r_{\mathrm{lin}}(m)=r_0+J\Delta\xi.$$
+**Equation (148):** $\mathrm{RSS}_{\mathrm{exact}}(m)=r_{\mathrm{exact}}(m)^Tr_{\mathrm{exact}}(m).$
 
-**(147)**
+The exact Huber objective is:
 
-The exact weighted residual sum of squares is
+**Equation (149):** $H_{\mathrm{exact}}(m)=\sum_i\ell_{0.020}(r_{\mathrm{exact},i}(m)).$
 
-$$\mathrm{RSS}_{\mathrm{exact}}(m)=r_{\mathrm{exact}}(m)^T r_{\mathrm{exact}}(m).$$
+The change in residual sum of squares is:
 
-**(148)**
+**Equation (150):** $\Delta\mathrm{RSS}(m)=\mathrm{RSS}_{\mathrm{exact}}(m)-\mathrm{RSS}_0.$
 
-The exact Huber objective is
+The likelihood-ratio-style statistic is:
 
-$$H_{\mathrm{exact}}(m)=\sum_i \ell_{0.020}\bigl(r_{\mathrm{exact},i}(m)\bigr)$$
+**Equation (151):** $\Lambda(m)=\dfrac{\Delta\mathrm{RSS}(m)}{\sigma_r^2}.$
 
-**(149)**
+The relative change in the Huber objective is:
 
-The change in residual sum of squares is
-
-$$\Delta\mathrm{RSS}(m)=\mathrm{RSS}_{\mathrm{exact}}(m)-\mathrm{RSS}_0.$$
-
-**(150)**
-
-The likelihood-ratio-style statistic is
-
-$$\Lambda(m)=\frac{\Delta\mathrm{RSS}(m)}{\sigma_r^2}.$$
-
-**(151)**
-
-The relative change in the Huber objective is
-
-$$\Delta H_{\mathrm{rel}}(m)=\frac{H_{\mathrm{exact}}(m)-H_0}{H_0}.$$
-
-**(152)**
+**Equation (152):** $\Delta H_{\mathrm{rel}}(m)=\dfrac{H_{\mathrm{exact}}(m)-H_0}{H_0}.$
 
 These are conditional slices. Other parameters remain fixed; the code does not reoptimize nuisance parameters at each profile point.
+
+---
 
 ## 37. Objective-Profile Classification
 
 A profile is classified `CENTER_NOT_SLICE_MINIMUM` when a noncentral point has a lower Huber objective than the frozen center beyond tolerance.
 
-Otherwise, define
+Otherwise, define:
 
-$$
-\Lambda_{\mathrm{outer}}
-=
-\min_{|m|=2}
-\Lambda(m).
-$$
+**Equation (153):** $\Lambda_{\mathrm{outer}}=\min_{|m|=2}\Lambda(m).$
 
-**(153)**
+The profile is classified `VERY_FLAT` when:
 
-The profile is classified `VERY_FLAT` when
+**Equation (154):** $\Lambda_{\mathrm{outer}}<0.25.$
 
-$$
-\Lambda_{\mathrm{outer}}<0.25.
-$$
+The profile is classified `WEAK` when:
 
-**(154)**
+**Equation (155):** $0.25\le\Lambda_{\mathrm{outer}}<1.$
 
-The profile is classified `WEAK` when
+The profile is classified `MODERATE` when:
 
-$$
-0.25
-\le
-\Lambda_{\mathrm{outer}}
-<
-1.
-$$
+**Equation (156):** $1\le\Lambda_{\mathrm{outer}}<4.$
 
-**(155)**
+The profile is classified `SHARP` when:
 
-The profile is classified `MODERATE` when
-
-$$
-1
-\le
-\Lambda_{\mathrm{outer}}
-<
-4.
-$$
-
-**(156)**
-
-The profile is classified `SHARP` when
-
-$$
-\Lambda_{\mathrm{outer}}
-\ge
-4.
-$$
-
-**(157)**
+**Equation (157):** $\Lambda_{\mathrm{outer}}\ge4.$
 
 The executed notebook evaluates:
 
@@ -2370,85 +1727,39 @@ The executed notebook evaluates:
 - 288 parameter-axis profile rows;
 - 72 weakest-direction profile rows.
 
-- ## 38. Exact Trajectory-Block Bootstrap
+---
+
+## 38. Exact Trajectory-Block Bootstrap
 
 The bootstrap operates only on training trajectories.
 
-Let the base weighted residual vector be divided into trajectory blocks:
+Let the base weighted residual vector be divided into trajectory blocks.
 
-$$
-r
-=
-\left(
-r_1^T,
-r_2^T,
-\ldots,
-r_S^T
-\right)^T.
-$$
+**Equation (158):** $r=(r_1^T,r_2^T,\ldots,r_S^T)^T.$
 
-**(158)**
+For bootstrap replicate $b$, the code draws $S$ trajectory indices with replacement.
 
-For bootstrap replicate $b$, the code draws $S$ trajectory indices with replacement:
+**Equation (159):** $s_1^{(b)},s_2^{(b)},\ldots,s_S^{(b)}.$
 
-$$
-s_1^{(b)},
-s_2^{(b)},
-\ldots,
-s_S^{(b)}.
-$$
+The bootstrap residual vector is formed by direct residual-block indexing.
 
-**(159)**
-
-The bootstrap residual vector is formed by direct residual-block indexing:
-
-$$
-r^{(b)}(\xi)
-=
-\left(
-r_{s_1^{(b)}}(\xi)^T,
-r_{s_2^{(b)}}(\xi)^T,
-\ldots,
-r_{s_S^{(b)}}(\xi)^T
-\right)^T.
-$$
-
-**(160)**
+**Equation (160):** $r^{(b)}(\xi)=(r_{s_1^{(b)}}(\xi)^T,r_{s_2^{(b)}}(\xi)^T,\ldots,r_{s_S^{(b)}}(\xi)^T)^T.$
 
 If a trajectory is sampled twice, its complete residual block appears twice.
 
 This is an exact block-resampling implementation for the robust objective; it is not a sample-level independent bootstrap.
 
-Each bootstrap estimate solves
-
-$$
-\widehat{\xi}^{(b)}
-=
-\underset{\xi}{\arg\min}
-\sum_i
-\ell_{0.020}
-\left(
-r_i^{(b)}(\xi)
-\right).
-$$
-
-**(161)**
+**Equation (161):** The bootstrap estimate $\widehat{\xi}^{(b)}$ is the value of $\xi$ that minimizes $\sum_i\ell_{0.020}(r_i^{(b)}(\xi))$.
 
 The frozen estimate initializes each bootstrap fit.
 
-The full run uses
+The full run uses:
 
-$$
-B=30
-$$
+- $B=30$ replicates for each candidate;
+- eight fitted candidates;
+- $8\times30=240$ bootstrap refits.
 
-replicates for each of eight candidates, giving
-
-$$
-8\times30=240
-$$
-
-bootstrap refits.
+---
 
 ## 39. Bootstrap Optimizer
 
@@ -2469,172 +1780,65 @@ When the first attempt does not report success, the code performs a fallback fit
 - up to 600 function evaluations;
 - tolerances no tighter than $10^{-7}$.
 
-A finite, physically valid result can be retained as usable even when the optimizer success flag is false. Usability and formal convergence are reported separately.
+A finite, physically valid result can be retained as usable even when the optimizer success flag is false.
+
+Usability and formal convergence are reported separately.
 
 ---
 
 ## 40. Bootstrap Statistics
 
-For parameter $\theta_j$, using $B_u$ usable bootstrap replicates, the bootstrap mean is
+For parameter $\theta_j$, using $B_u$ usable bootstrap replicates, the bootstrap mean is:
 
-$$
-\theta_j^*
-=
-\frac{1}{B_u}
-\sum_{b=1}^{B_u}
-\theta_j^{(b)}.
-$$
+**Equation (162):** $\theta_j^*=\dfrac{1}{B_u}\sum_{b=1}^{B_u}\theta_j^{(b)}.$
 
-**(162)**
+Bootstrap bias is:
 
-Bootstrap bias is
+**Equation (163):** $\mathrm{Bias}_j^*=\theta_j^*-\theta_j.$
 
-$$
-\mathrm{Bias}_j^*
-=
-\theta_j^*
--
-\theta_j.
-$$
+Relative bootstrap bias is:
 
-**(163)**
+**Equation (164):** $\mathrm{RBias}_j^*=\dfrac{\mathrm{Bias}_j^*}{|\theta_j|}.$
 
-Relative bootstrap bias is
+Bootstrap standard deviation is:
 
-$$
-\mathrm{RBias}_j^*
-=
-\frac{
-\mathrm{Bias}_j^*
-}{
-|\theta_j|
-}.
-$$
+**Equation (165):** $s_j^*=\sqrt{\dfrac{1}{B_u-1}\sum_{b=1}^{B_u}(\theta_j^{(b)}-\theta_j^*)^2}.$
 
-**(164)**
+Relative bootstrap standard deviation is:
 
-Bootstrap standard deviation is
+**Equation (166):** $\mathrm{RSD}_j^*=\dfrac{s_j^*}{|\theta_j|}.$
 
-$$
-s_j^*
-=
-\sqrt{
-\frac{1}{B_u-1}
-\sum_{b=1}^{B_u}
-\left(
-\theta_j^{(b)}
--
-\theta_j^*
-\right)^2
-}.
-$$
+The percentile interval is:
 
-**(165)**
+**Equation (167):** $[q_{0.025}(\theta_j^{(b)}),q_{0.975}(\theta_j^{(b)})].$
 
-Relative bootstrap standard deviation is
+Near-bound frequency is:
 
-$$
-\mathrm{RSD}_j^*
-=
-\frac{
-s_j^*
-}{
-|\theta_j|
-}.
-$$
-
-**(166)**
-
-The percentile interval is
-
-$$
-\left[
-q_{0.025}
-\left(
-\theta_j^{(b)}
-\right),
-q_{0.975}
-\left(
-\theta_j^{(b)}
-\right)
-\right].
-$$
-
-**(167)**
-
-Near-bound frequency is
-
-$$
-f_{j,\mathrm{bound}}^*
-=
-\frac{1}{B_u}
-\sum_{b=1}^{B_u}
-1
-\left(
-d_{j,b}^{\min}
-\le
-0.01
-\right).
-$$
-
-**(168)**
+**Equation (168):** $f_{j,\mathrm{bound}}^*=\dfrac{1}{B_u}\sum_{b=1}^{B_u}1(d_{j,b}^{\min}\le0.01).$
 
 ---
 
 ## 41. Bootstrap Stability Classification
 
-The minimum usable fraction is
+The minimum usable fraction is:
 
-$$
-f_{\mathrm{usable}}
-\ge
-0.80.
-$$
+**Equation (169):** $f_{\mathrm{usable}}\ge0.80.$
 
-**(169)**
+The minimum converged fraction is:
 
-The minimum converged fraction is
+**Equation (170):** $f_{\mathrm{conv}}\ge0.50.$
 
-$$
-f_{\mathrm{conv}}
-\ge
-0.50.
-$$
+A candidate is classified `STABLE` when:
 
-**(170)**
-
-A candidate is classified `STABLE` when
-
-$$
-\max_j
-\mathrm{RSD}_j^*
-\le
-0.20,
-$$
-
-**(171)**
+**Equation (171):** $\max_j\mathrm{RSD}_j^*\le0.20,$
 
 and
 
-$$
-\max_j
-f_{j,\mathrm{bound}}^*
-\le
-0.20.
-$$
+**Equation (172):** $\max_j f_{j,\mathrm{bound}}^*\le0.20.$
 
-**(172)**
+A candidate is classified `MODERATE` when:
 
-A candidate is classified `MODERATE` when
-
-$$
-\max_j
-\mathrm{RSD}_j^*
-\le
-0.50,
-$$
-
-**(173)**
+**Equation (173):** $\max_j\mathrm{RSD}_j^*\le0.50,$
 
 and the maximum near-bound frequency remains at most $0.20$.
 
@@ -2696,49 +1900,23 @@ Warnings are generated for:
 
 Let $H$ be the number of unique hard-failure reasons and $W$ be the number of unique warning reasons.
 
-The decision is `REJECT` when
+The decision is `REJECT` when $H>0$.
 
-$$
-H>0.
-$$
+The decision is `ACCEPT_WITH_CAUTION` when $H=0$ and $W>0$.
 
-The decision is `ACCEPT_WITH_CAUTION` when
+The decision is `ACCEPT` when $H=0$ and $W=0$.
 
-$$
-H=0
-\quad\text{and}\quad
-W>0.
-$$
+**Equation (174):** $D=\mathrm{REJECT}$ if $H>0$; $D=\mathrm{ACCEPT\_WITH\_CAUTION}$ if $H=0$ and $W>0$; otherwise $D=\mathrm{ACCEPT}$.
 
-The decision is `ACCEPT` when
+The acceptance score is:
 
-$$
-H=0
-\quad\text{and}\quad
-W=0.
-$$
+**Equation (175):** $A=\min(100,\max(0,100-30H-5W)).$
 
-**(174)**
+A high score cannot override a hard failure.
 
-The acceptance score is
+Any hard failure forces rejection.
 
-$$
-A
-=
-\min
-\left(
-100,
-\max
-\left(
-0,
-100-30H-5W
-\right)
-\right).
-$$
-
-**(175)**
-
-A high score cannot override a hard failure. Any hard failure forces rejection.
+---
 
 ## 45. Final Executed Candidate Results
 
@@ -2755,17 +1933,9 @@ The final executed candidate table reports:
 | NMC | 1RC | 0.240987 V | 0.036885 V | 0.520619 V | 0.824230 | 3 | 3 | `REJECT` |
 | NMC | 2RC | 0.402613 V | 0.110771 V | 0.520990 V | 0.932332 | 5 | 5 | `REJECT` |
 
-Every ordinary-test RMSE exceeds
+Every ordinary-test RMSE exceeds $0.050\ \mathrm{V}$.
 
-$$
-0.050\ \text{V}.
-$$
-
-Every strict-test RMSE exceeds
-
-$$
-0.075\ \text{V}.
-$$
+Every strict-test RMSE exceeds $0.075\ \mathrm{V}$.
 
 Therefore, every candidate has at least two predictive hard failures before considering identifiability, objective profiles, or bootstrap stability.
 
@@ -2794,65 +1964,43 @@ The other six models are full rank but classified as weak because of severe tran
 
 ## 47. Executed Objective-Profile Results
 
-The weakest joint direction is classified as
-
-`VERY_FLAT`
-
-for all eight candidates.
+The weakest joint direction is classified as `VERY_FLAT` for all eight candidates.
 
 The dominant weak directions include:
 
 - compensation between $\log R_0$ and $\log R_1$ in several one-RC models;
 - compensation between $\log R_1$ and $\log R_2$ in the global and NCA two-RC models;
-- a weak direction dominated by $\log \tau_1$ and $\log R_1$ for the NMC two-RC model.
+- a weak direction dominated by $\log\tau_1$ and $\log R_1$ for the NMC two-RC model.
 
-The NMC two-RC parameter-axis analysis also produces a
-
-`CENTER_NOT_SLICE_MINIMUM`
-
-result, creating an additional hard failure.
+The NMC two-RC parameter-axis analysis also produces a `CENTER_NOT_SLICE_MINIMUM` result, creating an additional hard failure.
 
 ---
 
 ## 48. Executed Bootstrap Results
 
-The code performs all
-
-$$
-240
-$$
-
-planned bootstrap refits.
+The code performs all 240 planned bootstrap refits.
 
 For the displayed final decision table:
 
-$$
-f_{\text{usable}}=1.0
-$$
+$f_{\mathrm{usable}}=1.0$
 
 and
 
-$$
-f_{\text{conv}}=1.0
-$$
+$f_{\mathrm{conv}}=1.0$
 
 for all eight candidates.
 
 Therefore, the bootstrap procedure itself completes successfully.
 
-However, every candidate receives the bootstrap stability classification
+However, every candidate receives the bootstrap stability classification:
 
-`WEAK`.
+`WEAK`
 
 The weakness is caused by large physical-parameter variability or frequent proximity to parameter bounds, not by an insufficient number of usable bootstrap runs.
 
-For example, the NCA two-RC time-constant gap has a relative bootstrap standard deviation exceeding
+For example, the NCA two-RC time-constant gap has a relative bootstrap standard deviation exceeding $2.09$.
 
-$$
-2.09,
-$$
-
-meaning that its bootstrap standard deviation is more than twice the magnitude of the frozen estimate.
+This means that its bootstrap standard deviation is more than twice the magnitude of the frozen estimate.
 
 ---
 
