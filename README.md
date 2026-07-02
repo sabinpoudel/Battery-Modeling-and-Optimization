@@ -504,7 +504,6 @@ The narrow bands also show that much of the dataset follows predefined experimen
 NCA provides the broadest two-dimensional excitation coverage, while LFP and NMC are more strongly concentrated along discrete current bands and high-SOC trajectories. The figure therefore identifies where LPV parameter estimation is data-supported and where predictions would involve interpolation or extrapolation.
 
 
-
 # Notebook 11
 
 ## Introduction
@@ -2332,3 +2331,4 @@ The implemented lag-one statistic is
 ```
 
 **(103)**
+
