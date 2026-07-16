@@ -13,7 +13,8 @@ Grateful acknowledgement is given to the **New Energy Research Center, Turku Uni
 
 
 
-# Note : Python codes are written with the help of AI; But, structure are debugged and verified.
+# Note: The Python code was written with AI assistance; however, the structure has been debugged and verified
+
 ## Pre-Processnig Plots 
 ####
 1. Dataset Composition
