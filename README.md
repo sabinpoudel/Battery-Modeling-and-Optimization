@@ -13,7 +13,7 @@ Grateful acknowledgement is given to the **New Energy Research Center, Turku Uni
 
 
 
-# Note: The Python code was written with AI assistance; however, the structure has been debugged and verified
+# Note: Python code was written with AI assistance; however, the structure has been debugged and verified
 
 ## Pre-Processnig Plots 
 ####
