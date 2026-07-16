@@ -11,6 +11,9 @@ The datasets used in this study were downloaded from the **FairData repository**
 
 Grateful acknowledgement is given to the **New Energy Research Center, Turku University of Applied Sciences, Turku, Finland**, for conducting the battery degradation experiments, collecting the voltage, current, temperature, and operating-profile measurements, and making the raw and processed datasets publicly available through FairData. 
 
+
+
+# Note : Python codes are written with the help of A;And structure are debugged and verified.
 ## Pre-Processnig Plots 
 ####
 1. Dataset Composition
